@@ -274,9 +274,7 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="open.png"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

@@ -32,8 +32,6 @@ class Emissor(QDialog, Ui_Emissor):
 		Ui_Emissor.__init__(self)
 		self.setupUi(self)		
 
-		self.reset = 0
-
 		self.lineEdit1.setHidden(not False)	
 		self.label1.setHidden(not False)	
 		self.label2.setHidden(not False)
@@ -44,9 +42,9 @@ class Emissor(QDialog, Ui_Emissor):
 
 		self.events()
 		self.recebePortasSeriais()
-
-		self.pushButton1.clicked.connect(self.lerEntrada) 	
-		self.pushButton2.clicked.connect(self.singleBrowse)						
+			
+		self.pushButton2.clicked.connect(self.singleBrowse)	
+		self.pushButton1.clicked.connect(self.lerEntrada) 					
 
 		self.timer.setInterval(300)
 		self.timer.start()	
@@ -68,13 +66,13 @@ class Emissor(QDialog, Ui_Emissor):
 	def enviaCaracter(self, PARAM_CARACTER):
 
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
-		time.sleep(0.01)
+		time.sleep(0.1)
 		
 		self.comport.write(str.encode(PARAM_CARACTER))
 		
-		VALUE_SERIAL=self.comport.readline()
+		VALUE_SERIAL=self.comport.readline()		
 
-		return(chr(int(VALUE_SERIAL)))
+		return(VALUE_SERIAL)
 		
 
 
@@ -82,23 +80,25 @@ class Emissor(QDialog, Ui_Emissor):
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.comboBox3.currentText(), self.comboBox4.currentText(), timeout=0.5, write_timeout=0.5)			
 		
-		PARAM_STRING=self.lineEdit1.text() #recebe a entrada
+		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada
+		PARAM_STRING = " "
+		PARAM_STRING += str(self.lineEdit1.text())		
 		if(self.comboBox1.currentText() == "Entrada em Arquivo"):
-			PARAM_STRING=self.label1.text()
-				
-		Frase = " "
-		for i in range(0,len(PARAM_STRING)):
-			Frase += self.enviaCaracter(PARAM_STRING[i])
-		self.reset += 1		
+			PARAM_STRING=str(self.label1.text())		
+		
+		if(len(PARAM_STRING) > 0):		
+			Frase = " "
+			for i in range(0,len(PARAM_STRING)):
+				Frase += self.enviaCaracter(PARAM_STRING[i])	
 
-		if(self.comboBox1.currentText() == "Entrada em Arquivo"):
-			self.label2.setText(Frase)
-		else: self.label1.setText(Frase)
+			if(self.comboBox1.currentText() == "Entrada em Arquivo"):
+				self.label2.setText(Frase)
+			else: self.label1.setText(str(Frase))
 		# Fechando conexao serial
 		self.comport.close()
 
 	def events(self):
-		self.timer.timeout.connect(self.atualizaOpcoes)	 			
+		self.timer.timeout.connect(self.atualizaOpcoes)						
 
 	def atualizaOpcoes(self):				
 		if(self.radioButton1.isChecked()):	
