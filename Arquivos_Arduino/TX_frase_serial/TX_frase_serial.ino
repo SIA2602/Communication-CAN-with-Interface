@@ -21,29 +21,18 @@ void setup()
 void loop()
 {
 
-  String frase;
+  unsigned char c[1];
     
-  while (Serial.available() > 0)
+  if (Serial.available() > 0)
   {         
-      char c = Serial.read();  
-      Serial.flush();    
-      unsigned long now = millis();
-      if(c == '\n')
-      {
-        while(millis() - now < 1000) Serial.read();
-        break;       
-      }      
-      frase += c;               
+      c[0] = Serial.read(); 
+      //Serial.println(c[0]);
+      Serial.flush();
+      //delay(1000);                    
   }
   
-  unsigned char msg[frase.length()];
-  for(int i=0; i<frase.length(); i++)
-  {
-    msg[i] = frase[i];
-  }  
-  
   //Serial.println("In loop");
-  CAN.sendMsgBuf(0x43, 0, frase.length(), msg);
+  CAN.sendMsgBuf(0x43, 0, 1, c);
   delay(1000);
 }
 
