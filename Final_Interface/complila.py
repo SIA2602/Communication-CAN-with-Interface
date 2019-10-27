@@ -38,7 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		#variaveis para a resolucao da tela
 		self.width = 1080
-		self.height = 1000
+		self.height = 950
 		self.height_main = 500
 		self.controle = False #variavel que controla a exclusao do grafico
 		self.controleReceive = False	
@@ -126,6 +126,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox2.setHidden(not False)
 		self.checkBox3.setHidden(not False)
 		self.horizontalSlider1.setHidden(not False)
+		self.horizontalSlider2.setHidden(not False)
 
 		#apagando grafico
 		if (self.checkBox1.isChecked() and self.controle == True):
@@ -150,6 +151,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def functionClearGraph(self):
 		#tirando a opcao de esta ativado
 		self.checkBox1.setChecked(False)
+
+	def functionViewPainel(self):
+		self.label5.setHidden(False)
+		self.label6.setHidden(False)
+		self.label7.setHidden(False)
+		self.label8.setHidden(False)
+		self.label9.setHidden(False)
+		self.label10.setHidden(False)		
+		self.comboBox3.setHidden(False)
+		self.comboBox4.setHidden(False)
+		self.radioButton1.setHidden(False)
+		self.radioButton2.setHidden(False)
+		self.checkBox2.setHidden(False)
+		self.checkBox3.setHidden(False)
+		self.horizontalSlider1.setHidden(False)
+		self.horizontalSlider2.setHidden(False)
+
+	def functionClearPainel(self):
+		self.label5.setHidden(not False)
+		self.label6.setHidden(not False)
+		self.label7.setHidden(not False)
+		self.label8.setHidden(not False)
+		self.label9.setHidden(not False)
+		self.comboBox3.setHidden(not False)
+		self.comboBox4.setHidden(not False)
+		self.radioButton1.setHidden(not False)
+		self.radioButton2.setHidden(not False)
+		self.checkBox2.setHidden(not False)
+		self.checkBox3.setHidden(not False)
+		self.horizontalSlider1.setHidden(not False)
+		self.horizontalSlider2.setHidden(not False)
 		
 	def actions(self):	
 		#carregando porta serial
@@ -159,7 +191,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		else: self.serialPort = QAction("&no serial ports", self, triggered=self.unselectSerialPort)	
 		self.Main = QAction("&Main...", self, shortcut="Ctrl+M", triggered=self.activateMain)
 		self.viewGraph = QAction("&View Graph", self, triggered=self.functionViewsGraph)	
-		self.clearGraph = QAction("&Clear Graph", self, triggered=self.functionClearGraph)	
+		self.clearGraph = QAction("&Clear Graph", self, triggered=self.functionClearGraph)
+		self.viewPainel = QAction("&View customization panel", self, triggered=self.functionViewPainel)	
+		self.clearPainel = QAction("&Clear customization panel", self, triggered=self.functionClearPainel)
 	
 	def incializationMain(self):
 		#variavel de controle para a func atualizaOpcoesASCII
@@ -198,6 +232,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox2.setHidden(not False)
 		self.checkBox3.setHidden(not False)
 		self.horizontalSlider1.setHidden(not False)
+		self.horizontalSlider2.setHidden(not False)
 		#criando menu da porta serial
 		self.tools = QMenu("&Tools", self)
 		self.menuBar().addMenu(self.tools)
@@ -211,8 +246,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.visualizar_grafico.addAction(self.viewGraph)
 		self.visualizar_grafico.addSeparator()
 		self.visualizar_grafico.addAction(self.clearGraph)
+		self.visualizar_grafico.addSeparator()
+		self.visualizar_grafico.addAction(self.viewPainel)
+		self.visualizar_grafico.addSeparator()
+		self.visualizar_grafico.addAction(self.clearPainel)
 		#deixando menu grafico indisponivel
-		self.visualizar_grafico.setEnabled(False)		
+		self.visualizar_grafico.setEnabled(False)				
 
 		self.tools.addSeparator()		
 		self.returnMain = self.tools.addMenu(" Return Main ")
@@ -262,8 +301,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label2.setHidden(False)
 		self.scrollArea1.setHidden(False)		
 		self.label10.setHidden(False)		
-		self.comboBox1.setHidden(not False)			
-		self.checkBox1.setHidden(False)		
+		self.comboBox1.setHidden(False)			
+		self.checkBox1.setHidden(not False)		
 
 	def optionASCII(self):
 		#por seguranca deixando menu da serial desabilitado
@@ -348,6 +387,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def createGraph(self):  
 		if self.checkBox1.isChecked():      
 			self.figure = plt.figure()
+			self.figure.subplots_adjust(left=0.025, bottom=0.085, right=0.99, top=0.97)
 			self.canvas = FigureCanvas(self.figure)
 			self.toolbar = NavigationToolbar(self.canvas, self)
 			self.graphLayout.addWidget(self.canvas)
@@ -386,37 +426,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def checkBoxGraph(self):
 		if (self.checkBox1.isChecked() and self.controle == False):			
 			self.createGraph() #ativa caixa do grafico	
-			self.plot()			
-			self.label5.setHidden(False)
-			self.label6.setHidden(False)
-			self.label7.setHidden(False)
-			self.label8.setHidden(False)
-			self.label9.setHidden(False)
-			self.label10.setHidden(False)		
-			self.comboBox3.setHidden(False)
-			self.comboBox4.setHidden(False)
-			self.radioButton1.setHidden(False)
-			self.radioButton2.setHidden(False)
-			self.checkBox2.setHidden(False)
-			self.checkBox3.setHidden(False)
-			self.horizontalSlider1.setHidden(False)
+			self.plot()				
 			#fixando o tamanho da janela inicial
 			self.resize(self.width, self.height)
 
 		elif (not(self.checkBox1.isChecked()) and self.controle == True):			
-			self.clearGrafico()			
-			self.label5.setHidden(not False)
-			self.label6.setHidden(not False)
-			self.label7.setHidden(not False)
-			self.label8.setHidden(not False)
-			self.label9.setHidden(not False)
-			self.comboBox3.setHidden(not False)
-			self.comboBox4.setHidden(not False)
-			self.radioButton1.setHidden(not False)
-			self.radioButton2.setHidden(not False)
-			self.checkBox2.setHidden(not False)
-			self.checkBox3.setHidden(not False)
-			self.horizontalSlider1.setHidden(not False)
+			self.clearGrafico()				
 			#fixando o tamanho da janela inicial
 			self.resize(self.width, self.height_main)	
 
@@ -442,12 +457,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def ASCII_to_Bin(self, texto):		
 		return bin(int(binascii.hexlify(texto), 16))	
 
-	def plot_NRZ(self):					
+	def plot_NRZ(self):	
+		self.radioButton1.setHidden(not False)
+		self.radioButton2.setHidden(not False)	#oculta opcao do bit anterior				
 		#valores para grafico	
 		if(self.lineEdit1.text() != "" and len(self.binario) > 0):	
 			self.y = self.binario
 			self.y = [self.y[0]] + self.y
 			self.x = [ i for i in range(len(self.y)) ]
+
+	def plot_NRZ_L(self):
+		#valores para grafico		
+		self.plot_NRZ()
+
+		for i in range(len(self.y)):
+			if(self.y[i] == 0): self.y[i] = 1
+			elif(self.y[i] == 1): self.y[i] = -1	
+		self.x = [ i for i in range(len(self.y)) ]	
+
+	def plot_NRZ_I_1(self):		
+		self.plot_NRZ()
+		self.radioButton1.setHidden(not True)
+		self.radioButton2.setHidden(not True)
+		for i in range(1,len(self.y)):	
+			if(self.y[i] == 1):
+				if(self.y[i-1] == 0): self.y[i] = 1
+				else: self.y[i] = 0
+			else: self.y[i] = self.y[i-1]
+
+		for i in range(len(self.y)):
+			if(self.y[i] == 0): self.y[i] = -1 
+
+	def plot_NRZ_I(self):
+		
+		self.radioButton1.setHidden(not True)
+		self.radioButton2.setHidden(not True)
+			
+		if(self.radioButton1.isChecked()):
+			self.plot_NRZ_I_1()
+
+		if(self.radioButton2.isChecked()):
+			self.plot_NRZ_I_1()	
+			for i in range(len(self.y)):
+				if(self.y[i] == 1): self.y[i] = -1
+				else: self.y[i] = 1 
 
 	@staticmethod
 	def return_bin(value): #dado um int bin eh retornado uma lista dos valores
