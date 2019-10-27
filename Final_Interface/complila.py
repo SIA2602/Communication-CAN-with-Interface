@@ -40,7 +40,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.width = 1080
 		self.height = 1000
 		self.height_main = 500
-		self.controle = False #variavel que controla a exclusao do grafico		
+		self.controle = False #variavel que controla a exclusao do grafico
+		self.controleReceive = False	
+		self.controleSend = False	
 
 		self.timer = QTimer(self)	
 
@@ -74,8 +76,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def recebePortasSeriais(self):		
 		self.listaPortas = serialPorts()		
 
-	def activateMain(self):
-		#voltando a habilitar serial
+	def activateMain(self):		
+		#deixando menu grafico indisponivel
+		self.visualizar_grafico.setEnabled(False)
+		#variavel de controle para a func atualizaOpcoesASCII
+		self.controleSend = False
+		self.controleReceive = False
+		#voltando a habilitar serial e apagando menu
 		self.select.setEnabled(not False)
 		self.select.clear()
 		self.select.removeAction(self.serialPort)				
@@ -105,8 +112,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox1.setHidden(not False)
 		self.scrollArea1.setHidden(not False)
 		self.scrollArea2.setHidden(not False)
-
-		self.label4.setHidden(not False)
+		
 		self.label5.setHidden(not False)
 		self.label6.setHidden(not False)
 		self.label7.setHidden(not False)
@@ -134,8 +140,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.toolbar = None
 			self.controle = False
 
-		#criando menu da porta serial		
-		self.select.addAction(self.serialPort)			
+		#recriando menu da porta serial		
+		self.select.addAction(self.serialPort)	
+
+	def functionViewsGraph(self):
+		#deixando ativado
+		self.checkBox1.setChecked(not False)	
+
+	def functionClearGraph(self):
+		#tirando a opcao de esta ativado
+		self.checkBox1.setChecked(False)
 		
 	def actions(self):	
 		#carregando porta serial
@@ -144,8 +158,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if(len(self.listaPortas) > 0): self.serialPort = QAction("&"+self.listaPortas[0], self, triggered=self.selectSerialPort)	
 		else: self.serialPort = QAction("&no serial ports", self, triggered=self.unselectSerialPort)	
 		self.Main = QAction("&Main...", self, shortcut="Ctrl+M", triggered=self.activateMain)
+		self.viewGraph = QAction("&View Graph", self, triggered=self.functionViewsGraph)	
+		self.clearGraph = QAction("&Clear Graph", self, triggered=self.functionClearGraph)	
 	
-	def incializationMain(self):		
+	def incializationMain(self):
+		#variavel de controle para a func atualizaOpcoesASCII
+		self.controleSend = False
+		self.controleReceive = False	
 		#ativando main
 		#deixando menu de opcoes indisponiveis ate ser escolhida a porta serial
 		self.pushButton1.setEnabled(False)
@@ -165,8 +184,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox1.setHidden(not False)
 		self.scrollArea1.setHidden(not False)
 		self.scrollArea2.setHidden(not False)
-
-		self.label4.setHidden(not False)
+		
 		self.label5.setHidden(not False)
 		self.label6.setHidden(not False)
 		self.label7.setHidden(not False)
@@ -184,14 +202,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.tools = QMenu("&Tools", self)
 		self.menuBar().addMenu(self.tools)
 		self.tools.addSeparator()
+
 		self.select = self.tools.addMenu(" Select Serial Port ")
 		self.select.addAction(self.serialPort)		
 		self.tools.addSeparator()
+
+		self.visualizar_grafico = self.tools.addMenu(" Graph ")
+		self.visualizar_grafico.addAction(self.viewGraph)
+		self.visualizar_grafico.addSeparator()
+		self.visualizar_grafico.addAction(self.clearGraph)
+		#deixando menu grafico indisponivel
+		self.visualizar_grafico.setEnabled(False)		
+
+		self.tools.addSeparator()		
 		self.returnMain = self.tools.addMenu(" Return Main ")
 		self.returnMain.addAction(self.Main)        
 		self.tools.addSeparator()		
 
-	def optionSendASCII(self):		
+	def optionSendASCII(self):
+		#variavel de controle para a func atualizaOpcoesASCII	
+		self.controleSend = True	
 		#ajustando janela
 		self.resize(self.width, self.height_main)
 		#ocultando menus que nao pertencem ao menu selecionado		
@@ -208,11 +238,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.comboBox2.setHidden(False)
 		self.pushButton6.setHidden(False)
 		self.pushButton7.setHidden(False)
-		self.checkBox1.setHidden(False)	
+		self.checkBox1.setHidden(not False)	
 		self.scrollArea1.setHidden(False)
 		self.scrollArea2.setHidden(False)	
 
 	def optionReceiveASCII(self):
+		#variavel de controle para a func atualizaOpcoesASCII
+		self.controleReceive = True
 		#ajustando janela
 		self.resize(self.width, self.height_main)
 		#ocultando menus que nao pertencem ao menu selecionado		
@@ -227,9 +259,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton7.setHidden(not False)
 
 		#mostrando itens pertencentes ao menu
-		self.label2.setHidden(False)		
+		self.label2.setHidden(False)
+		self.scrollArea1.setHidden(False)		
 		self.label10.setHidden(False)		
-		self.comboBox1.setHidden(False)				
+		self.comboBox1.setHidden(not False)			
 		self.checkBox1.setHidden(False)		
 
 	def optionASCII(self):
@@ -247,37 +280,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.clicked.connect(self.optionSendASCII)	
 		self.pushButton5.clicked.connect(self.optionReceiveASCII)	
 
-	def atualizaOpcoesASCII(self):		
-		if(self.comboBox2.count() == 0):
-			self.comboBox2.clear()
-			self.comboBox2.addItem("Selecione")	
-			self.comboBox2.addItem("Entrada em Texto")	
-			self.comboBox2.addItem("Entrada em Arquivo")
+	def atualizaOpcoesASCII(self):
+		if(self.controleSend == True):				
+			if(self.comboBox2.currentText() == "Selecione"):
+				self.lineEdit1.setHidden(not False)	
+				self.label2.setHidden(not False)
+				self.label3.setHidden(not False)
+				self.pushButton6.setHidden(not False)
 
-		elif(self.comboBox2.currentText() == "Selecione"):
-			self.lineEdit1.setHidden(not False)	
-			self.label2.setHidden(not False)
-			self.label3.setHidden(not False)
-			self.pushButton6.setHidden(not False)
+			elif(self.comboBox2.currentText() == "Entrada em Texto"):
+				self.lineEdit1.setEnabled(not False)
+				self.lineEdit1.setHidden(False)	
+				self.label2.setHidden(False)	
+				self.label3.setHidden(False)
+				self.pushButton6.setHidden(not False)			
 
-		elif(self.comboBox2.currentText() == "Entrada em Texto"):
-			self.lineEdit1.setHidden(False)	
-			self.label2.setHidden(False)	
-			self.label3.setHidden(False)
-			self.pushButton6.setHidden(not False)
-		
-
-		elif(self.comboBox2.currentText() == "Entrada em Arquivo"):
-			self.lineEdit1.setHidden(False)	
-			self.label2.setHidden(False)
-			self.label3.setHidden(False)
-			self.pushButton6.setHidden(False)
-
-		else:
-			self.lineEdit1.setHidden(not False)	
-			self.label2.setHidden(not False)
-			self.label3.setHidden(not False)				
-			self.pushButton6.setHidden(not False)	
+			elif(self.comboBox2.currentText() == "Entrada em Arquivo"):
+				self.lineEdit1.setEnabled(False)
+				self.lineEdit1.setHidden(False)	
+				self.label2.setHidden(False)
+				self.label3.setHidden(False)
+				self.pushButton6.setHidden(False)
+		if(self.controleSend == True or self.controleReceive == True):
+			#deixando menu grafico indisponivel
+			self.visualizar_grafico.setEnabled(not False)		
 
 	def browseASCII(self):
 		filename = QFileDialog.getOpenFileName(self, 'Open File', os.getenv('HOME'))
@@ -360,8 +386,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def checkBoxGraph(self):
 		if (self.checkBox1.isChecked() and self.controle == False):			
 			self.createGraph() #ativa caixa do grafico	
-			self.plot()
-			self.label4.setHidden(False)
+			self.plot()			
 			self.label5.setHidden(False)
 			self.label6.setHidden(False)
 			self.label7.setHidden(False)
@@ -379,8 +404,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.resize(self.width, self.height)
 
 		elif (not(self.checkBox1.isChecked()) and self.controle == True):			
-			self.clearGrafico()
-			self.label4.setHidden(not False)
+			self.clearGrafico()			
 			self.label5.setHidden(not False)
 			self.label6.setHidden(not False)
 			self.label7.setHidden(not False)
