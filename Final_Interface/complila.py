@@ -33,6 +33,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		self.x = []
 		self.y = []
+		self.x_bin = []
+		self.y_bin = []
 		self.binario = []
 		self.listaPortas = []
 
@@ -77,6 +79,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.listaPortas = serialPorts()		
 
 	def activateMain(self):		
+		#limpando coisas digitadas
+		self.lineEdit1.clear()
+		self.label2.clear()	
+		self.label3.clear()	
+		self.x = []
+		self.y = []
 		#deixando menu grafico indisponivel
 		self.visualizar_grafico.setEnabled(False)
 		#variavel de controle para a func atualizaOpcoesASCII
@@ -109,6 +117,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.comboBox2.setHidden(not False)		
 		self.pushButton6.setHidden(not False)
 		self.pushButton7.setHidden(not False)
+		self.checkBox6.setHidden(not False)
 		self.checkBox1.setHidden(not False)
 		self.scrollArea1.setHidden(not False)
 		self.scrollArea2.setHidden(not False)
@@ -118,13 +127,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label7.setHidden(not False)
 		self.label8.setHidden(not False)
 		self.label9.setHidden(not False)
-		self.label10.setHidden(not False)		
+		self.label10.setHidden(not False)	
+		self.label11.setHidden(not False)
+		self.label12.setHidden(not False)	
+		self.spinBox1.setHidden(not False)	
 		self.comboBox3.setHidden(not False)
 		self.comboBox4.setHidden(not False)
 		self.radioButton1.setHidden(not False)
 		self.radioButton2.setHidden(not False)
 		self.checkBox2.setHidden(not False)
 		self.checkBox3.setHidden(not False)
+		self.checkBox4.setHidden(not False)
+		self.checkBox5.setHidden(not False)
 		self.horizontalSlider1.setHidden(not False)
 		self.horizontalSlider2.setHidden(not False)
 
@@ -146,11 +160,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def functionViewsGraph(self):
 		#deixando ativado
-		self.checkBox1.setChecked(not False)	
+		self.checkBox1.setChecked(not False)
+		self.horizontalSlider2.setHidden(False)	
 
 	def functionClearGraph(self):
 		#tirando a opcao de esta ativado
 		self.checkBox1.setChecked(False)
+		self.horizontalSlider2.setHidden(not False)
 
 	def functionViewPainel(self):
 		self.label5.setHidden(False)
@@ -158,30 +174,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label7.setHidden(False)
 		self.label8.setHidden(False)
 		self.label9.setHidden(False)
-		self.label10.setHidden(False)		
+		self.label10.setHidden(False)
+		self.label11.setHidden(False)	
+		self.label12.setHidden(False)	
+		self.spinBox1.setHidden(False)		
 		self.comboBox3.setHidden(False)
 		self.comboBox4.setHidden(False)
 		self.radioButton1.setHidden(False)
 		self.radioButton2.setHidden(False)
 		self.checkBox2.setHidden(False)
 		self.checkBox3.setHidden(False)
+		self.checkBox4.setHidden(False)
+		self.checkBox5.setHidden(False)
 		self.horizontalSlider1.setHidden(False)
-		self.horizontalSlider2.setHidden(False)
-
+		
 	def functionClearPainel(self):
 		self.label5.setHidden(not False)
 		self.label6.setHidden(not False)
 		self.label7.setHidden(not False)
 		self.label8.setHidden(not False)
 		self.label9.setHidden(not False)
+		self.label11.setHidden(not False)
+		self.label12.setHidden(not False)		
+		self.spinBox1.setHidden(not False)
 		self.comboBox3.setHidden(not False)
 		self.comboBox4.setHidden(not False)
 		self.radioButton1.setHidden(not False)
 		self.radioButton2.setHidden(not False)
 		self.checkBox2.setHidden(not False)
 		self.checkBox3.setHidden(not False)
-		self.horizontalSlider1.setHidden(not False)
-		self.horizontalSlider2.setHidden(not False)
+		self.checkBox4.setHidden(not False)
+		self.checkBox5.setHidden(not False)
+		self.horizontalSlider1.setHidden(not False)		
 		
 	def actions(self):	
 		#carregando porta serial
@@ -190,10 +214,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if(len(self.listaPortas) > 0): self.serialPort = QAction("&"+self.listaPortas[0], self, triggered=self.selectSerialPort)	
 		else: self.serialPort = QAction("&no serial ports", self, triggered=self.unselectSerialPort)	
 		self.Main = QAction("&Main...", self, shortcut="Ctrl+M", triggered=self.activateMain)
-		self.viewGraph = QAction("&View Graph", self, triggered=self.functionViewsGraph)	
-		self.clearGraph = QAction("&Clear Graph", self, triggered=self.functionClearGraph)
-		self.viewPainel = QAction("&View customization panel", self, triggered=self.functionViewPainel)	
-		self.clearPainel = QAction("&Clear customization panel", self, triggered=self.functionClearPainel)
+		self.viewGraph = QAction("&View Graph", self, shortcut="Ctrl+G", triggered=self.functionViewsGraph)	
+		self.clearGraph = QAction("&Clear Graph", self, shortcut="Ctrl+K", triggered=self.functionClearGraph)
+		self.viewPainel = QAction("&View customization panel", self, shortcut="Ctrl+P", triggered=self.functionViewPainel)	
+		self.clearPainel = QAction("&Clear customization panel", self, shortcut="Ctrl+L", triggered=self.functionClearPainel)
 	
 	def incializationMain(self):
 		#variavel de controle para a func atualizaOpcoesASCII
@@ -215,6 +239,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.comboBox2.setHidden(not False)		
 		self.pushButton6.setHidden(not False)
 		self.pushButton7.setHidden(not False)
+		self.checkBox6.setHidden(not False)
 		self.checkBox1.setHidden(not False)
 		self.scrollArea1.setHidden(not False)
 		self.scrollArea2.setHidden(not False)
@@ -224,13 +249,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label7.setHidden(not False)
 		self.label8.setHidden(not False)
 		self.label9.setHidden(not False)
-		self.label10.setHidden(not False)		
+		self.label10.setHidden(not False)	
+		self.label11.setHidden(not False)
+		self.label12.setHidden(not False)	
+		self.spinBox1.setHidden(not False)
 		self.comboBox3.setHidden(not False)
 		self.comboBox4.setHidden(not False)
 		self.radioButton1.setHidden(not False)
 		self.radioButton2.setHidden(not False)
 		self.checkBox2.setHidden(not False)
 		self.checkBox3.setHidden(not False)
+		self.checkBox4.setHidden(not False)
+		self.checkBox5.setHidden(not False)
 		self.horizontalSlider1.setHidden(not False)
 		self.horizontalSlider2.setHidden(not False)
 		#criando menu da porta serial
@@ -277,6 +307,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.comboBox2.setHidden(False)
 		self.pushButton6.setHidden(False)
 		self.pushButton7.setHidden(False)
+		self.checkBox6.setHidden(False)
 		self.checkBox1.setHidden(not False)	
 		self.scrollArea1.setHidden(False)
 		self.scrollArea2.setHidden(False)	
@@ -296,6 +327,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.comboBox2.setHidden(not False)
 		self.pushButton6.setHidden(not False)
 		self.pushButton7.setHidden(not False)
+		self.checkBox6.setHidden(not False)
 
 		#mostrando itens pertencentes ao menu
 		self.label2.setHidden(False)
@@ -387,7 +419,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def createGraph(self):  
 		if self.checkBox1.isChecked():      
 			self.figure = plt.figure()
-			self.figure.subplots_adjust(left=0.025, bottom=0.085, right=0.99, top=0.97)
+			self.figure.subplots_adjust(left=0.070, bottom=0.085, right=0.99, top=0.97, hspace=0.13)
 			self.canvas = FigureCanvas(self.figure)
 			self.toolbar = NavigationToolbar(self.canvas, self)
 			self.graphLayout.addWidget(self.canvas)
@@ -396,31 +428,114 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	#apenas para teste do grafico
 	def plot(self):
-		self.figure.clear()				
-		self.ax = self.figure.add_subplot(111)
-		self.ax.step(self.x, self.y, color=self.printColor(), linewidth=self.linesWidth()) #opcao ativa imprime grafico	
-		self.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-		self.ax.xaxis.set_major_locator(MaxNLocator(integer=True))		
-		self.ax.xaxis.grid(color='gray', linestyle='--', linewidth=0.5)
-		self.ax.xaxis.grid(self.checkBox3.isChecked())	
-		self.ax.yaxis.grid(color='gray', linestyle='--', linewidth=0.5)			
-		self.ax.yaxis.grid(self.checkBox2.isChecked())
-		self.ax.set_facecolor((39./256.,40./256.,34./256.))	
-		self.figure.set_facecolor((39./256.,40./256.,34./256.))
-		color = "white"	
-		self.ax.spines['bottom'].set_color(color)
-		self.ax.spines['top'].set_color(color)
-		self.ax.spines['left'].set_color(color)
-		self.ax.spines['right'].set_color(color)
-		for t in self.ax.xaxis.get_ticklines(): t.set_color(color)
-		for t in self.ax.yaxis.get_ticklines(): t.set_color(color)
-		for t in self.ax.xaxis.get_ticklines(): t.set_color(color)
-		for t in self.ax.yaxis.get_ticklines(): t.set_color(color)
-		for label in self.ax.get_yticklabels():
-			label.set_color(color)
-		for label in self.ax.get_xticklabels():
-			label.set_color(color)
-		self.canvas.draw()	
+		self.figure.clear()	
+		
+		if(len(self.x) > 0):
+			#controle para imprimir a quantidade de bits desajado
+			self.horizontalSlider2.setMaximum(100)	
+			value = (self.x[-1] - 19*self.spinBox1.value()/20)*self.horizontalSlider2.value()/99
+			start = value - self.spinBox1.value()/20
+			end = start + 21*self.spinBox1.value()/20
+			#nao deixando ultrapassar o numero maximo de bits para visualizacao
+			if(self.spinBox1.value()+1 > len(self.y)): self.spinBox1.setValue(len(self.y))
+			else:
+				if(self.checkBox4.isChecked() and self.checkBox5.isChecked()): self.ax = self.figure.add_subplot(313)
+				elif(self.checkBox4.isChecked() or self.checkBox5.isChecked()): self.ax = self.figure.add_subplot(212)			
+				else:
+					#primeiro grafico default
+					self.ax = self.figure.add_subplot(111)
+				#ajustando eixo de visualizacao			
+				self.ax.set_xlim(start, end)			
+				self.ax.step(self.x, self.y, color=self.printColor(), linewidth=self.linesWidth()) #opcao ativa imprime grafico				
+				self.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+				self.ax.xaxis.set_major_locator(MaxNLocator(integer=True))		
+				self.ax.xaxis.grid(color='gray', linestyle='--', linewidth=0.5)
+				self.ax.xaxis.grid(self.checkBox3.isChecked())	
+				self.ax.yaxis.grid(color='gray', linestyle='--', linewidth=0.5)			
+				self.ax.yaxis.grid(self.checkBox2.isChecked())
+				self.ax.set_facecolor((39./256.,40./256.,34./256.))	
+				self.figure.set_facecolor((39./256.,40./256.,34./256.))
+				color = "white"	
+				self.ax.set_ylabel(self.comboBox3.currentText(), color=color, size=15)
+				self.ax.spines['bottom'].set_color(color)
+				self.ax.spines['top'].set_color(color)
+				self.ax.spines['left'].set_color(color)
+				self.ax.spines['right'].set_color(color)
+				for t in self.ax.xaxis.get_ticklines(): t.set_color(color)
+				for t in self.ax.yaxis.get_ticklines(): t.set_color(color)
+				for t in self.ax.xaxis.get_ticklines(): t.set_color(color)
+				for t in self.ax.yaxis.get_ticklines(): t.set_color(color)
+				for label in self.ax.get_yticklabels():
+					label.set_color(color)
+				for label in self.ax.get_xticklabels():
+					label.set_color(color)			
+
+				#caso se deseje o grafico binario	
+				if self.checkBox4.isChecked():							
+					if self.checkBox5.isChecked(): self.ax1 = self.figure.add_subplot(311)	
+					else: self.ax1 = self.figure.add_subplot(211)							
+					#ajustando eixo de visualizacao			
+					self.ax1.set_xlim(start, end)			
+					self.ax1.step(self.x_bin, self.y_bin, color=self.printColor(), linewidth=self.linesWidth()) #opcao ativa imprime grafico	
+					self.ax1.yaxis.set_major_locator(MaxNLocator(integer=True))
+					self.ax1.xaxis.set_major_locator(MaxNLocator(integer=True))		
+					self.ax1.xaxis.grid(color='gray', linestyle='--', linewidth=0.5)
+					self.ax1.xaxis.grid(self.checkBox3.isChecked())	
+					self.ax1.yaxis.grid(color='gray', linestyle='--', linewidth=0.5)			
+					self.ax1.yaxis.grid(self.checkBox2.isChecked())
+					self.ax1.set_facecolor((39./256.,40./256.,34./256.))	
+					self.figure.set_facecolor((39./256.,40./256.,34./256.))
+					color = "white"	
+					self.ax1.set_ylabel("Binario", color=color, size=15)
+					self.ax1.spines['bottom'].set_color(color)
+					self.ax1.spines['top'].set_color(color)
+					self.ax1.spines['left'].set_color(color)
+					self.ax1.spines['right'].set_color(color)
+					for t in self.ax1.xaxis.get_ticklines(): t.set_color(color)
+					for t in self.ax1.yaxis.get_ticklines(): t.set_color(color)
+					for t in self.ax1.xaxis.get_ticklines(): t.set_color(color)
+					for t in self.ax1.yaxis.get_ticklines(): t.set_color(color)
+					for label in self.ax1.get_yticklabels():
+						label.set_color(color)
+					for label in self.ax1.get_xticklabels():
+						label.set_color(color)	
+					#ocultando valores do eixo x				
+					self.ax1.set_xticklabels([])		
+
+				#caso se deseje o grafico do ruido	
+				if self.checkBox5.isChecked():							
+					if self.checkBox4.isChecked(): self.ax2 = self.figure.add_subplot(312)
+					else: self.ax2 = self.figure.add_subplot(211)							
+					#ajustando eixo de visualizacao			
+					self.ax2.set_xlim(start, end)			
+					self.ax2.step(self.x_bin, self.y_bin, color=self.printColor(), linewidth=self.linesWidth()) #opcao ativa imprime grafico	
+					self.ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
+					self.ax2.xaxis.set_major_locator(MaxNLocator(integer=True))		
+					self.ax2.xaxis.grid(color='gray', linestyle='--', linewidth=0.5)
+					self.ax2.xaxis.grid(self.checkBox3.isChecked())	
+					self.ax2.yaxis.grid(color='gray', linestyle='--', linewidth=0.5)			
+					self.ax2.yaxis.grid(self.checkBox2.isChecked())
+					self.ax2.set_facecolor((39./256.,40./256.,34./256.))	
+					self.figure.set_facecolor((39./256.,40./256.,34./256.))
+					color = "white"	
+					self.ax2.set_ylabel("Ruido", color=color, size=15)
+					self.ax2.spines['bottom'].set_color(color)
+					self.ax2.spines['top'].set_color(color)
+					self.ax2.spines['left'].set_color(color)
+					self.ax2.spines['right'].set_color(color)
+					for t in self.ax2.xaxis.get_ticklines(): t.set_color(color)
+					for t in self.ax2.yaxis.get_ticklines(): t.set_color(color)
+					for t in self.ax2.xaxis.get_ticklines(): t.set_color(color)
+					for t in self.ax2.yaxis.get_ticklines(): t.set_color(color)
+					for label in self.ax2.get_yticklabels():
+						label.set_color(color)
+					for label in self.ax2.get_xticklabels():
+						label.set_color(color)	
+					#ocultando valores do eixo x				
+					self.ax2.set_xticklabels([])	
+
+				self.canvas.draw()	
+		else: return
 
 	#faz o controle tanto das opcoes quanto do tamanho da tela quando o grafico for solicitado
 	def checkBoxGraph(self):
@@ -465,6 +580,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.y = self.binario
 			self.y = [self.y[0]] + self.y
 			self.x = [ i for i in range(len(self.y)) ]
+
+			self.y_bin = self.binario
+			self.y_bin = [self.y_bin[0]] + self.y_bin
+			self.x_bin = [ i for i in range(len(self.y_bin)) ]
 
 	def plot_NRZ_L(self):
 		#valores para grafico		
