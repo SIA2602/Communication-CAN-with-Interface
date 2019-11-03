@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os
-import sip #usado para deletar o grafico da
+import sip #usado para deletar o grafico
 import numpy as np
 
 import binascii
@@ -12,7 +12,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter, QColor
 from PyQt5.QtPrintSupport import QPrintDialog, QPrinter
-from PyQt5.QtWidgets import QLabel, QSizePolicy, QScrollArea, QMessageBox, QMainWindow, QMenu, QAction, qApp, QFileDialog, QApplication
+from PyQt5.QtWidgets import QLabel, QSizePolicy, QScrollArea, QMessageBox, QMainWindow, QMenu, QAction, qApp, QFileDialog, QApplication, QMdiSubWindow
 
 from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -30,6 +30,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		QMainWindow.__init__(self, parent=parent)
 		Ui_MainWindow.__init__(self)
 		self.setupUi(self)
+
+		#area exclusiva para a imagem
+		self.R = []
+		self.G = []
+		self.B = []
+		#criando o label da imagem
+		self.labelIMAGE = QLabel()		
+		self.labelIMAGE.setBackgroundRole(QPalette.Base)
+		self.labelIMAGE.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+		self.labelIMAGE.setScaledContents(True)
+		#criando uma area para por o label e configurar sua escala
+		self.scrollAreaIMAGE = QScrollArea()
+		self.scrollAreaIMAGE.setBackgroundRole(QPalette.Dark)
+		self.scrollAreaIMAGE.setWidget(self.labelIMAGE)
+		self.scrollAreaIMAGE.setVisible(False)
+		#self.mdi = QMdiArea()      	
+		self.sub = QMdiSubWindow()
+		self.sub.setWidget(self.scrollAreaIMAGE)
+		self.sub.resize(600,400)
+		self.sub.setWindowTitle("Image Viewer")
+		self.mdiArea.addSubWindow(self.sub)
+		#criando menus para imagem
+		self.createActions()
+		self.createMenus()
+		#deixando menu grafico indisponivel
+		self.fileMenu.setEnabled(False)
+		self.viewMenu.setEnabled(False)
 
 		self.x = []
 		self.y = []
@@ -53,12 +80,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.createGraph()		
 		#caso escolha a opcao ASCII
 		self.pushButton1.clicked.connect(self.optionASCII)
+		self.pushButton2.clicked.connect(self.optionIMAGE)
 		self.pushButton6.clicked.connect(self.browseASCII)
 		#fixando o tamanho da janela inicial
 		self.resize(self.width, self.height_main)		
 		self.events()
 
-		self.timer.setInterval(100)
+		self.timer.setInterval(300)
 		self.timer.start()		
 
 	def events(self):
@@ -78,7 +106,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def recebePortasSeriais(self):		
 		self.listaPortas = serialPorts()		
 
-	def activateMain(self):		
+	def activateMain(self):	
+		#deixando desativado
+		self.checkBoxIMAGE.setChecked(False)
+
 		#limpando coisas digitadas
 		self.lineEdit1.clear()
 		self.label2.clear()	
@@ -86,7 +117,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.x = []
 		self.y = []
 		#deixando menu grafico indisponivel
-		self.visualizar_grafico.setEnabled(False)
+		self.visualizar_grafico.setEnabled(False)		
+		self.fileMenu.setEnabled(False)
+		self.viewMenu.setEnabled(False)
 		#variavel de controle para a func atualizaOpcoesASCII
 		self.controleSend = False
 		self.controleReceive = False
@@ -121,6 +154,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox1.setHidden(not False)
 		self.scrollArea1.setHidden(not False)
 		self.scrollArea2.setHidden(not False)
+		self.mdiArea.setHidden(not False)
+		self.labelPORCENTAGEM.setHidden(not False)
+		self.spinBoxPORCENTAGEM.setHidden(not False)
+		self.labelRGB.setHidden(not False)
+		self.radioButtonR.setHidden(not False)
+		self.radioButtonG.setHidden(not False)
+		self.radioButtonB.setHidden(not False)
 		
 		self.label5.setHidden(not False)
 		self.label6.setHidden(not False)
@@ -139,6 +179,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox3.setHidden(not False)
 		self.checkBox4.setHidden(not False)
 		self.checkBox5.setHidden(not False)
+		self.checkBoxIMAGE.setHidden(not False)
 		self.horizontalSlider1.setHidden(not False)
 		self.horizontalSlider2.setHidden(not False)
 
@@ -166,7 +207,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def functionClearGraph(self):
 		#tirando a opcao de esta ativado
 		self.checkBox1.setChecked(False)
-		self.horizontalSlider2.setHidden(not False)
+		self.horizontalSlider2.setHidden(not False)	
 
 	def functionViewPainel(self):
 		self.label5.setHidden(False)
@@ -243,6 +284,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox1.setHidden(not False)
 		self.scrollArea1.setHidden(not False)
 		self.scrollArea2.setHidden(not False)
+		self.mdiArea.setHidden(not False)
+		self.labelPORCENTAGEM.setHidden(not False)
+		self.spinBoxPORCENTAGEM.setHidden(not False)
+		self.labelRGB.setHidden(not False)
+		self.radioButtonR.setHidden(not False)
+		self.radioButtonG.setHidden(not False)
+		self.radioButtonB.setHidden(not False)
 		
 		self.label5.setHidden(not False)
 		self.label6.setHidden(not False)
@@ -261,6 +309,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox3.setHidden(not False)
 		self.checkBox4.setHidden(not False)
 		self.checkBox5.setHidden(not False)
+		self.checkBoxIMAGE.setHidden(not False)
 		self.horizontalSlider1.setHidden(not False)
 		self.horizontalSlider2.setHidden(not False)
 		#criando menu da porta serial
@@ -279,7 +328,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.visualizar_grafico.addSeparator()
 		self.visualizar_grafico.addAction(self.viewPainel)
 		self.visualizar_grafico.addSeparator()
-		self.visualizar_grafico.addAction(self.clearPainel)
+		self.visualizar_grafico.addAction(self.clearPainel)		
 		#deixando menu grafico indisponivel
 		self.visualizar_grafico.setEnabled(False)				
 
@@ -297,6 +346,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label1.setHidden(not False)
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
+		self.mdiArea.setHidden(not False)
+		self.checkBoxIMAGE.setHidden(not False)
+		self.labelPORCENTAGEM.setHidden(not False)
+		self.spinBoxPORCENTAGEM.setHidden(not False)
+		self.labelRGB.setHidden(not False)
+		self.radioButtonR.setHidden(not False)
+		self.radioButtonG.setHidden(not False)
+		self.radioButtonB.setHidden(not False)
 
 		#mostrando itens pertencentes ao menu
 		self.label2.setHidden(False)
@@ -310,7 +367,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox6.setHidden(False)
 		self.checkBox1.setHidden(not False)	
 		self.scrollArea1.setHidden(False)
-		self.scrollArea2.setHidden(False)	
+		self.scrollArea2.setHidden(False)
+
+	def optionSendIMAGE(self):
+		#deixando ativado
+		self.checkBoxIMAGE.setChecked(not False)		
+		#deixando menu grafico disponivel
+		self.fileMenu.setEnabled(not False)
+		self.viewMenu.setEnabled(not False)
+		#ajustando janela
+		self.resize(self.width, self.height)
+		#ocultando menus que nao pertencem ao menu selecionado		
+		self.label1.setHidden(not False)
+		self.pushButton4.setHidden(not False)
+		self.pushButton5.setHidden(not False)		
+		self.scrollArea2.setHidden(not False)		
+		self.label3.setHidden(not False)		
+		self.lineEdit1.setHidden(not False)		
+		self.comboBox2.setHidden(not False)
+		self.pushButton6.setHidden(not False)		
+		self.checkBox1.setHidden(not False)		
+		self.checkBoxIMAGE.setHidden(not False)
+
+		#mostrando itens pertencentes ao menu	
+		self.scrollArea1.setHidden(False)
+		self.label2.setHidden(False)
+		self.mdiArea.setHidden(False)	
+		self.label10.setHidden(False)		
+		self.comboBox1.setHidden(False)			
+		self.pushButton7.setHidden(False)
+		self.checkBox6.setHidden(False)		
+		self.labelPORCENTAGEM.setHidden(False)
+		self.spinBoxPORCENTAGEM.setHidden(False)
+		self.labelRGB.setHidden(False)
+		self.radioButtonR.setHidden(False)
+		self.radioButtonG.setHidden(False)
+		self.radioButtonB.setHidden(False)	
 
 	def optionReceiveASCII(self):
 		#variavel de controle para a func atualizaOpcoesASCII
@@ -322,19 +414,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
 
+		self.mdiArea.setHidden(not False)
 		self.label3.setHidden(not False)
 		self.lineEdit1.setHidden(not False)
 		self.comboBox2.setHidden(not False)
 		self.pushButton6.setHidden(not False)
 		self.pushButton7.setHidden(not False)
 		self.checkBox6.setHidden(not False)
+		self.checkBoxIMAGE.setHidden(not False)
+		self.labelPORCENTAGEM.setHidden(not False)
+		self.spinBoxPORCENTAGEM.setHidden(not False)
+		self.labelRGB.setHidden(not False)
+		self.radioButtonR.setHidden(not False)
+		self.radioButtonG.setHidden(not False)
+		self.radioButtonB.setHidden(not False)
 
-		#mostrando itens pertencentes ao menu
+		#mostrando itens pertencentes ao menu		
 		self.label2.setHidden(False)
 		self.scrollArea1.setHidden(False)		
 		self.label10.setHidden(False)		
 		self.comboBox1.setHidden(False)			
 		self.checkBox1.setHidden(not False)		
+
+	def optionReceiveIMAGE(self):
+		self.optionIMAGE()
 
 	def optionASCII(self):
 		#por seguranca deixando menu da serial desabilitado
@@ -349,7 +452,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton5.setHidden(False)
 		#caso escolha uma das opcoes disponiveis
 		self.pushButton4.clicked.connect(self.optionSendASCII)	
-		self.pushButton5.clicked.connect(self.optionReceiveASCII)	
+		self.pushButton5.clicked.connect(self.optionReceiveASCII)
+
+	def optionIMAGE(self):
+		#por seguranca deixando menu da serial desabilitado
+		self.select.setEnabled(False)						
+		#apagando Menu anterior
+		self.pushButton1.setHidden(not False)
+		self.pushButton2.setHidden(not False)
+		self.pushButton3.setHidden(not False)		
+		#ativando opcoes do proximo menu		
+		self.label1.setText("Select an Option to Emissor or Receptor")
+		self.pushButton4.setHidden(False)
+		self.pushButton5.setHidden(False)
+		#caso escolha uma das opcoes disponiveis
+		self.pushButton4.clicked.connect(self.optionSendIMAGE)	
+		self.pushButton5.clicked.connect(self.optionReceiveIMAGE)	
 
 	def atualizaOpcoesASCII(self):
 		if(self.controleSend == True):				
@@ -548,7 +666,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		elif (not(self.checkBox1.isChecked()) and self.controle == True):			
 			self.clearGrafico()				
 			#fixando o tamanho da janela inicial
-			self.resize(self.width, self.height_main)	
+			if (self.checkBoxIMAGE.isChecked()): self.resize(self.width, self.height)	
+			else: self.resize(self.width, self.height_main)
 
 	def update(self):
 		if(self.comboBox3.currentText() == 'NRZ'): self.plot_NRZ()	
@@ -558,7 +677,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBoxGraph()
 		self.gravaMensagem()	
 		self.actions()	
-		self.atualizaOpcoesASCII()		
+		self.atualizaOpcoesASCII()
+		self.convertIMAGE_to_Binary_in_label()		
 
 	def gravaMensagem(self):
 		global texto		
@@ -576,7 +696,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButton1.setHidden(not False)
 		self.radioButton2.setHidden(not False)	#oculta opcao do bit anterior				
 		#valores para grafico	
-		if(self.lineEdit1.text() != "" and len(self.binario) > 0):	
+		if((self.lineEdit1.text() != "" and len(self.binario) > 0) or (self.checkBoxIMAGE.isChecked() and len(self.binario) > 0)) :	
 			self.y = self.binario
 			self.y = [self.y[0]] + self.y
 			self.x = [ i for i in range(len(self.y)) ]
@@ -641,6 +761,154 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		except ValueError:
 			return None
 		return values
+
+	#funcoes apenas para a visualizacao da imagem
+	def zoomIn(self):
+		self.scaleImage(1.25)
+
+	def zoomOut(self):
+		self.scaleImage(0.8)
+
+	def normalSize(self):
+		self.labelIMAGE.adjustSize()
+		self.scaleFactor = 1.0
+
+	def fitToWindow(self):
+		fitToWindow = self.fitToWindowAct.isChecked()
+		self.scrollAreaIMAGE.setWidgetResizable(fitToWindow)
+		if not fitToWindow:
+			self.normalSize()
+
+		self.updateActions()
+
+	def open(self):
+	    options = QFileDialog.Options()
+	    # fileName = QFileDialog.getOpenFileName(self, "Open File", QDir.currentPath())
+	    fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
+	                                              'Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)
+	    if fileName:
+	        image = QImage(fileName)
+	        if image.isNull():
+	            QMessageBox.information(self, "Image Viewer", "Cannot load %s." % fileName)
+	            return
+
+	        self.labelIMAGE.setPixmap(QPixmap.fromImage(image))
+	        self.scaleFactor = 1.0
+
+	        self.scrollAreaIMAGE.setVisible(True)
+            self.fitToWindowAct.setEnabled(True)
+            self.updateActions()
+
+            if not self.fitToWindowAct.isChecked():
+	            self.labelIMAGE.adjustSize()
+
+	        #carregando a imagem e salvando em lista R,G e B
+            im = Image.open(fileName)
+            rgb_im = im.convert('RGB')
+            image_width = image.width()
+            image_height = image.height()
+            #print image_width, image_height            
+            for i in range(0,int((self.spinBoxPORCENTAGEM.value()/100.)*image_width)):
+            	for j in range(0,int((self.spinBoxPORCENTAGEM.value()/100.)*image_height)):
+            		r,g,b = rgb_im.getpixel((i,j))
+            		#print i,j,r,g,b
+            		self.R.append(r)
+            		self.G.append(g)
+            		self.B.append(b)
+            I = np.array(im) #convetendo em vertor numpy
+            arr2im = Image.fromarray(I) #voltando para imagem   
+            #arr2im.show() #imprimindo imagem
+            #print self.return_bin(self._hex_to_binary(hex(R[0])[2:]))
+
+	def convertIMAGE_to_Binary_in_label(self):
+		if (self.checkBoxIMAGE.isChecked()):
+			if(self.radioButtonR.isChecked()):
+				if(len(self.R) > 0):
+					texto = self._hex_to_binary([hex(x)[2:] for x in self.R])	
+					self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+					#print self.binario			
+					self.label2.setText(texto)
+					self.plot_NRZ()
+			elif(self.radioButtonG.isChecked()):
+				if(len(self.G) > 0):
+					texto = self._hex_to_binary([hex(x)[2:] for x in self.G])	
+					self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+					#print self.binario			
+					self.label2.setText(texto)
+					self.plot_NRZ()
+			elif(self.radioButtonB.isChecked()):
+				if(len(self.B) > 0):
+					texto = self._hex_to_binary([hex(x)[2:] for x in self.B])	
+					self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+					#print self.binario			
+					self.label2.setText(texto)
+					self.plot_NRZ() 
+
+	def functionViewsImage(self):
+		#ajustando janela
+		if(self.checkBoxIMAGE.isChecked()): self.resize(self.width, self.height)
+		else: self.resize(self.width, self.height_main)		
+		self.mdiArea.setHidden(False)
+
+	def functionClearImage(self):
+		#ajustando janela
+		if(self.checkBox1.isChecked()): self.resize(self.width, self.height)
+		else: self.resize(self.width, self.height_main)
+		self.mdiArea.setHidden(not False)               	               
+
+	def createActions(self):
+		self.openAct = QAction("&Open...", self, shortcut="Ctrl+O", triggered=self.open)
+		self.exitAct = QAction("E&xit", self, shortcut="Ctrl+Q", triggered=self.close)
+		self.zoomInAct = QAction("Zoom &In (25%)", self, shortcut="Ctrl++", enabled=False, triggered=self.zoomIn)
+		self.zoomOutAct = QAction("Zoom &Out (25%)", self, shortcut="Ctrl+-", enabled=False, triggered=self.zoomOut)
+		self.normalSizeAct = QAction("&Normal Size", self, shortcut="Ctrl+S", enabled=False, triggered=self.normalSize)
+		self.fitToWindowAct = QAction("&Fit to Window", self, enabled=False, checkable=True, shortcut="Ctrl+F", triggered=self.fitToWindow)
+		self.viewImage = QAction("&View Image", self, shortcut="Ctrl+I", triggered=self.functionViewsImage)	
+		self.clearImage = QAction("&Clear Image", self, shortcut="Ctrl+U", triggered=self.functionClearImage)
+
+	def createMenus(self):
+		self.fileMenu = QMenu("&File", self)
+		self.fileMenu.addSeparator()
+		self.fileMenu.addAction(self.openAct)        
+		self.fileMenu.addSeparator()
+		self.fileMenu.addAction(self.exitAct)
+		self.fileMenu.addSeparator()
+
+		self.viewMenu = QMenu("&View", self)
+		self.viewMenu.addSeparator()
+		self.viewMenu.addAction(self.viewImage)
+		self.viewMenu.addSeparator()
+		self.viewMenu.addAction(self.clearImage)
+		self.viewMenu.addSeparator()
+		self.viewMenu.addAction(self.zoomInAct)
+		self.viewMenu.addSeparator()
+		self.viewMenu.addAction(self.zoomOutAct)
+		self.viewMenu.addSeparator()
+		self.viewMenu.addAction(self.normalSizeAct)
+		self.viewMenu.addSeparator()
+		self.viewMenu.addAction(self.fitToWindowAct)
+		self.viewMenu.addSeparator()
+
+		self.menuBar().addMenu(self.fileMenu)
+		self.menuBar().addMenu(self.viewMenu)
+
+	def updateActions(self):
+		self.zoomInAct.setEnabled(not self.fitToWindowAct.isChecked())
+		self.zoomOutAct.setEnabled(not self.fitToWindowAct.isChecked())
+		self.normalSizeAct.setEnabled(not self.fitToWindowAct.isChecked())
+
+	def scaleImage(self, factor):
+		self.scaleFactor *= factor
+		self.labelIMAGE.resize(self.scaleFactor * self.labelIMAGE.pixmap().size())
+
+		self.adjustScrollBar(self.scrollAreaIMAGE.horizontalScrollBar(), factor)
+		self.adjustScrollBar(self.scrollAreaIMAGE.verticalScrollBar(), factor)
+
+		self.zoomInAct.setEnabled(self.scaleFactor < 3.0)
+		self.zoomOutAct.setEnabled(self.scaleFactor > 0.333)
+
+	def adjustScrollBar(self, scrollBar, factor):
+		scrollBar.setValue(int(factor * scrollBar.value() + ((factor - 1) * scrollBar.pageStep() / 2)))
 
 
 	
