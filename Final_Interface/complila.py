@@ -86,7 +86,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.resize(self.width, self.height_main)		
 		self.events()
 
-		self.timer.setInterval(300)
+		self.timer.setInterval(100)
 		self.timer.start()		
 
 	def events(self):
@@ -108,14 +108,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def activateMain(self):	
 		#deixando desativado
+		self.checkBoxASCII.setChecked(False)
 		self.checkBoxIMAGE.setChecked(False)
+
+		#limpando comboBox
+		self.comboBox2.clear()
+		self.comboBox2.addItem("Selecione")
+		self.comboBox2.addItem("Entrada em Texto")
+		self.comboBox2.addItem("Entrada em Arquivo")		
 
 		#limpando coisas digitadas
 		self.lineEdit1.clear()
 		self.label2.clear()	
 		self.label3.clear()	
+		self.labelIMAGE.clear()
 		self.x = []
 		self.y = []
+		self.R = []
+		self.G = []
+		self.B = []
+		self.texto = []
+		self.binario = []
 		#deixando menu grafico indisponivel
 		self.visualizar_grafico.setEnabled(False)		
 		self.fileMenu.setEnabled(False)
@@ -180,6 +193,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox4.setHidden(not False)
 		self.checkBox5.setHidden(not False)
 		self.checkBoxIMAGE.setHidden(not False)
+		self.checkBoxASCII.setHidden(not False)
 		self.horizontalSlider1.setHidden(not False)
 		self.horizontalSlider2.setHidden(not False)
 
@@ -310,6 +324,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox4.setHidden(not False)
 		self.checkBox5.setHidden(not False)
 		self.checkBoxIMAGE.setHidden(not False)
+		self.checkBoxASCII.setHidden(not False)
 		self.horizontalSlider1.setHidden(not False)
 		self.horizontalSlider2.setHidden(not False)
 		#criando menu da porta serial
@@ -338,6 +353,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.tools.addSeparator()		
 
 	def optionSendASCII(self):
+		#deixando ativado ASCII e sativando Imagem
+		self.checkBoxASCII.setChecked(not False)
+		self.checkBoxIMAGE.setChecked(False)
 		#variavel de controle para a func atualizaOpcoesASCII	
 		self.controleSend = True	
 		#ajustando janela
@@ -370,8 +388,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.scrollArea2.setHidden(False)
 
 	def optionSendIMAGE(self):
-		#deixando ativado
-		self.checkBoxIMAGE.setChecked(not False)		
+		#deixando ativado Imagem e desativando ASCII
+		self.checkBoxIMAGE.setChecked(not False)
+		self.checkBoxASCII.setChecked(False)		
 		#deixando menu grafico disponivel
 		self.fileMenu.setEnabled(not False)
 		self.viewMenu.setEnabled(not False)
@@ -469,7 +488,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.clicked.connect(self.optionSendIMAGE)	
 		self.pushButton5.clicked.connect(self.optionReceiveIMAGE)	
 
-	def atualizaOpcoesASCII(self):
+	def atualizaOpcoesASCII(self):		
 		if(self.controleSend == True):				
 			if(self.comboBox2.currentText() == "Selecione"):
 				self.lineEdit1.setHidden(not False)	
@@ -677,8 +696,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBoxGraph()
 		self.gravaMensagem()	
 		self.actions()	
-		self.atualizaOpcoesASCII()
-		self.convertIMAGE_to_Binary_in_label()		
+		if (self.checkBoxASCII.isChecked()): self.atualizaOpcoesASCII()
+		if (self.checkBoxIMAGE.isChecked()): self.convertIMAGE_to_Binary_in_label()		
 
 	def gravaMensagem(self):
 		global texto		
@@ -782,67 +801,67 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.updateActions()
 
 	def open(self):
-	    options = QFileDialog.Options()
-	    # fileName = QFileDialog.getOpenFileName(self, "Open File", QDir.currentPath())
-	    fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
-	                                              'Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)
-	    if fileName:
-	        image = QImage(fileName)
-	        if image.isNull():
-	            QMessageBox.information(self, "Image Viewer", "Cannot load %s." % fileName)
-	            return
-
-	        self.labelIMAGE.setPixmap(QPixmap.fromImage(image))
-	        self.scaleFactor = 1.0
-
-	        self.scrollAreaIMAGE.setVisible(True)
-            self.fitToWindowAct.setEnabled(True)
-            self.updateActions()
-
-            if not self.fitToWindowAct.isChecked():
-	            self.labelIMAGE.adjustSize()
-
-	        #carregando a imagem e salvando em lista R,G e B
-            im = Image.open(fileName)
-            rgb_im = im.convert('RGB')
-            image_width = image.width()
-            image_height = image.height()
-            #print image_width, image_height            
-            for i in range(0,int((self.spinBoxPORCENTAGEM.value()/100.)*image_width)):
-            	for j in range(0,int((self.spinBoxPORCENTAGEM.value()/100.)*image_height)):
-            		r,g,b = rgb_im.getpixel((i,j))
-            		#print i,j,r,g,b
-            		self.R.append(r)
-            		self.G.append(g)
-            		self.B.append(b)
-            I = np.array(im) #convetendo em vertor numpy
-            arr2im = Image.fromarray(I) #voltando para imagem   
-            #arr2im.show() #imprimindo imagem
-            #print self.return_bin(self._hex_to_binary(hex(R[0])[2:]))
-
-	def convertIMAGE_to_Binary_in_label(self):
 		if (self.checkBoxIMAGE.isChecked()):
-			if(self.radioButtonR.isChecked()):
-				if(len(self.R) > 0):
-					texto = self._hex_to_binary([hex(x)[2:] for x in self.R])	
-					self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
-					#print self.binario			
-					self.label2.setText(texto)
-					self.plot_NRZ()
-			elif(self.radioButtonG.isChecked()):
-				if(len(self.G) > 0):
-					texto = self._hex_to_binary([hex(x)[2:] for x in self.G])	
-					self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
-					#print self.binario			
-					self.label2.setText(texto)
-					self.plot_NRZ()
-			elif(self.radioButtonB.isChecked()):
-				if(len(self.B) > 0):
-					texto = self._hex_to_binary([hex(x)[2:] for x in self.B])	
-					self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
-					#print self.binario			
-					self.label2.setText(texto)
-					self.plot_NRZ() 
+		    options = QFileDialog.Options()
+		    # fileName = QFileDialog.getOpenFileName(self, "Open File", QDir.currentPath())
+		    fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
+		                                              'Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)
+		    if fileName:
+		        image = QImage(fileName)
+		        if image.isNull():
+		            QMessageBox.information(self, "Image Viewer", "Cannot load %s." % fileName)
+		            return
+
+		        self.labelIMAGE.setPixmap(QPixmap.fromImage(image))
+		        self.scaleFactor = 1.0
+
+		        self.scrollAreaIMAGE.setVisible(True)
+	            self.fitToWindowAct.setEnabled(True)
+	            self.updateActions()
+
+	            if not self.fitToWindowAct.isChecked():
+		            self.labelIMAGE.adjustSize()
+
+		        #carregando a imagem e salvando em lista R,G e B
+	            im = Image.open(fileName)
+	            rgb_im = im.convert('RGB')
+	            image_width = image.width()
+	            image_height = image.height()
+	            #print image_width, image_height            
+	            for i in range(0,int((self.spinBoxPORCENTAGEM.value()/100.)*image_width)):
+	            	for j in range(0,int((self.spinBoxPORCENTAGEM.value()/100.)*image_height)):
+	            		r,g,b = rgb_im.getpixel((i,j))
+	            		#print i,j,r,g,b
+	            		self.R.append(r)
+	            		self.G.append(g)
+	            		self.B.append(b)
+	            I = np.array(im) #convetendo em vertor numpy
+	            arr2im = Image.fromarray(I) #voltando para imagem   
+	            #arr2im.show() #imprimindo imagem
+	            #print self.return_bin(self._hex_to_binary(hex(R[0])[2:]))
+
+	def convertIMAGE_to_Binary_in_label(self):		
+		if(self.radioButtonR.isChecked()):
+			if(len(self.R) > 0):
+				texto = self._hex_to_binary([hex(x)[2:] for x in self.R])	
+				self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+				#print self.binario			
+				self.label2.setText(texto)
+				self.plot_NRZ()
+		elif(self.radioButtonG.isChecked()):
+			if(len(self.G) > 0):
+				texto = self._hex_to_binary([hex(x)[2:] for x in self.G])	
+				self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+				#print self.binario			
+				self.label2.setText(texto)
+				self.plot_NRZ()
+		elif(self.radioButtonB.isChecked()):
+			if(len(self.B) > 0):
+				texto = self._hex_to_binary([hex(x)[2:] for x in self.B])	
+				self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+				#print self.binario			
+				self.label2.setText(texto)
+				self.plot_NRZ() 
 
 	def functionViewsImage(self):
 		#ajustando janela

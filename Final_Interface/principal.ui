@@ -1007,6 +1007,13 @@
            </layout>
           </item>
           <item>
+           <widget class="QCheckBox" name="checkBoxASCII">
+            <property name="text">
+             <string>ASCII</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="checkBoxIMAGE">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
