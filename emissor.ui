@@ -34,7 +34,7 @@
        <item>
         <widget class="QRadioButton" name="radioButton2">
          <property name="text">
-          <string>Ima&amp;gem</string>
+          <string>&amp;Imagem</string>
          </property>
         </widget>
        </item>

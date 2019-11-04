@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import time
+import serial
+
 import sys, os
 import sip #usado para deletar o grafico
 import numpy as np
@@ -82,11 +85,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton1.clicked.connect(self.optionASCII)
 		self.pushButton2.clicked.connect(self.optionIMAGE)
 		self.pushButton6.clicked.connect(self.browseASCII)
+		self.pushButton7.clicked.connect(self.lerEntrada)
 		#fixando o tamanho da janela inicial
 		self.resize(self.width, self.height_main)		
 		self.events()
 
-		self.timer.setInterval(100)
+		self.timer.setInterval(300)
 		self.timer.start()		
 
 	def events(self):
@@ -119,8 +123,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		#limpando coisas digitadas
 		self.lineEdit1.clear()
-		self.label2.clear()	
-		self.label3.clear()	
+		self.label2.clear()			
 		self.labelIMAGE.clear()
 		self.x = []
 		self.y = []
@@ -156,8 +159,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
 
-		self.label2.setHidden(not False)
-		self.label3.setHidden(not False)
+		self.label2.setHidden(not False)		
 		self.lineEdit1.setHidden(not False)
 		self.comboBox1.setHidden(not False)
 		self.comboBox2.setHidden(not False)		
@@ -165,8 +167,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton7.setHidden(not False)
 		self.checkBox6.setHidden(not False)
 		self.checkBox1.setHidden(not False)
-		self.scrollArea1.setHidden(not False)
-		self.scrollArea2.setHidden(not False)
+		self.scrollArea1.setHidden(not False)		
 		self.mdiArea.setHidden(not False)
 		self.labelPORCENTAGEM.setHidden(not False)
 		self.spinBoxPORCENTAGEM.setHidden(not False)
@@ -287,8 +288,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
 
-		self.label2.setHidden(not False)
-		self.label3.setHidden(not False)
+		self.label2.setHidden(not False)		
 		self.lineEdit1.setHidden(not False)
 		self.comboBox1.setHidden(not False)
 		self.comboBox2.setHidden(not False)		
@@ -296,8 +296,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton7.setHidden(not False)
 		self.checkBox6.setHidden(not False)
 		self.checkBox1.setHidden(not False)
-		self.scrollArea1.setHidden(not False)
-		self.scrollArea2.setHidden(not False)
+		self.scrollArea1.setHidden(not False)		
 		self.mdiArea.setHidden(not False)
 		self.labelPORCENTAGEM.setHidden(not False)
 		self.spinBoxPORCENTAGEM.setHidden(not False)
@@ -374,8 +373,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonB.setHidden(not False)
 
 		#mostrando itens pertencentes ao menu
-		self.label2.setHidden(False)
-		self.label3.setHidden(False)
+		self.label2.setHidden(False)		
 		self.label10.setHidden(False)
 		self.lineEdit1.setHidden(False)
 		self.comboBox1.setHidden(False)
@@ -384,8 +382,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton7.setHidden(False)
 		self.checkBox6.setHidden(False)
 		self.checkBox1.setHidden(not False)	
-		self.scrollArea1.setHidden(False)
-		self.scrollArea2.setHidden(False)
+		self.scrollArea1.setHidden(False)		
 
 	def optionSendIMAGE(self):
 		#deixando ativado Imagem e desativando ASCII
@@ -399,9 +396,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		#ocultando menus que nao pertencem ao menu selecionado		
 		self.label1.setHidden(not False)
 		self.pushButton4.setHidden(not False)
-		self.pushButton5.setHidden(not False)		
-		self.scrollArea2.setHidden(not False)		
-		self.label3.setHidden(not False)		
+		self.pushButton5.setHidden(not False)					
 		self.lineEdit1.setHidden(not False)		
 		self.comboBox2.setHidden(not False)
 		self.pushButton6.setHidden(not False)		
@@ -433,8 +428,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
 
-		self.mdiArea.setHidden(not False)
-		self.label3.setHidden(not False)
+		self.mdiArea.setHidden(not False)		
 		self.lineEdit1.setHidden(not False)
 		self.comboBox2.setHidden(not False)
 		self.pushButton6.setHidden(not False)
@@ -492,22 +486,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if(self.controleSend == True):				
 			if(self.comboBox2.currentText() == "Selecione"):
 				self.lineEdit1.setHidden(not False)	
-				self.label2.setHidden(not False)
-				self.label3.setHidden(not False)
+				self.label2.setHidden(not False)				
 				self.pushButton6.setHidden(not False)
 
 			elif(self.comboBox2.currentText() == "Entrada em Texto"):
 				self.lineEdit1.setEnabled(not False)
 				self.lineEdit1.setHidden(False)	
-				self.label2.setHidden(False)	
-				self.label3.setHidden(False)
+				self.label2.setHidden(False)					
 				self.pushButton6.setHidden(not False)			
 
 			elif(self.comboBox2.currentText() == "Entrada em Arquivo"):
 				self.lineEdit1.setEnabled(False)
 				self.lineEdit1.setHidden(False)	
-				self.label2.setHidden(False)
-				self.label3.setHidden(False)
+				self.label2.setHidden(False)				
 				self.pushButton6.setHidden(False)
 		if(self.controleSend == True or self.controleReceive == True):
 			#deixando menu grafico indisponivel
@@ -816,8 +807,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		        self.scaleFactor = 1.0
 
 		        self.scrollAreaIMAGE.setVisible(True)
-	            self.fitToWindowAct.setEnabled(True)
-	            self.updateActions()
+		        self.fitToWindowAct.setEnabled(True)
+		        self.updateActions()
 
 	            if not self.fitToWindowAct.isChecked():
 		            self.labelIMAGE.adjustSize()
@@ -928,6 +919,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def adjustScrollBar(self, scrollBar, factor):
 		scrollBar.setValue(int(factor * scrollBar.value() + ((factor - 1) * scrollBar.pageStep() / 2)))
+
+	#funcoes para o emissor em ASCII
+	def enviaCaracter(self, PARAM_CARACTER):
+		# Time entre a conexao serial e o tempo para escrever (enviar algo)
+		time.sleep(1)
+		self.comport.write(str.encode(PARAM_CARACTER))		
+
+	def lerEntrada(self):		
+		# Iniciando conexao serial		
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.5, write_timeout=0.5)			
+		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada
+		PARAM_STRING = " " + str(self.lineEdit1.text()) + " "			
+		
+		if(len(PARAM_STRING) > 0):				
+			for i in range(0,len(PARAM_STRING)):
+				self.enviaCaracter(PARAM_STRING[i])				
+		# Fechando conexao serial
+		self.comport.close()
 
 
 	
