@@ -9,15 +9,15 @@ MCP_CAN CAN(spiCSPin);
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(115200);
     pinMode(ledPin,OUTPUT);
 
     while (CAN_OK != CAN.begin(CAN_500KBPS))
     {
-        Serial.println("CAN BUS Init Failed");
+        //Serial.println("CAN BUS Init Failed");
         delay(100);
     }
-    Serial.println("CAN BUS  Init OK!");
+    //Serial.println("CAN BUS  Init OK!");
 }
 
 
@@ -32,20 +32,20 @@ void loop()
 
         unsigned long canId = CAN.getCanId();
 
-        Serial.println("-----------------------------");
-        Serial.print("Data from ID: 0x");
-        Serial.println(canId, HEX);
+        //Serial.println("-----------------------------");
+        //Serial.print("Data from ID: 0x");
+        //Serial.println(canId, HEX);
 
         for(int i = 0; i<len; i++)
         {
             Serial.print(char(buf[i]));
-            Serial.print("\t");
+            //Serial.print("\t");
             if(ledON && i==0)
             {
 
                 digitalWrite(ledPin, buf[i]);
                 ledON = 0;
-                delay(500);
+                delay(50);
             }
             else if((!(ledON)) && i==4)
             {

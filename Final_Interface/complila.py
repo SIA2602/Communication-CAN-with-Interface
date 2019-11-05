@@ -86,6 +86,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton2.clicked.connect(self.optionIMAGE)
 		self.pushButton6.clicked.connect(self.browseASCII)
 		self.pushButton7.clicked.connect(self.lerEntrada)
+		self.pushButton8.clicked.connect(self.lerEntradaRecebida)
 		#fixando o tamanho da janela inicial
 		self.resize(self.width, self.height_main)		
 		self.events()
@@ -165,6 +166,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.comboBox2.setHidden(not False)		
 		self.pushButton6.setHidden(not False)
 		self.pushButton7.setHidden(not False)
+		self.pushButton8.setHidden(not False)
 		self.checkBox6.setHidden(not False)
 		self.checkBox1.setHidden(not False)
 		self.scrollArea1.setHidden(not False)		
@@ -294,6 +296,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.comboBox2.setHidden(not False)		
 		self.pushButton6.setHidden(not False)
 		self.pushButton7.setHidden(not False)
+		self.pushButton8.setHidden(not False)
 		self.checkBox6.setHidden(not False)
 		self.checkBox1.setHidden(not False)
 		self.scrollArea1.setHidden(not False)		
@@ -371,6 +374,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonR.setHidden(not False)
 		self.radioButtonG.setHidden(not False)
 		self.radioButtonB.setHidden(not False)
+		self.pushButton8.setHidden(not False)
 
 		#mostrando itens pertencentes ao menu
 		self.label2.setHidden(False)		
@@ -402,6 +406,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton6.setHidden(not False)		
 		self.checkBox1.setHidden(not False)		
 		self.checkBoxIMAGE.setHidden(not False)
+		self.pushButton8.setHidden(not False)
 
 		#mostrando itens pertencentes ao menu	
 		self.scrollArea1.setHidden(False)
@@ -428,8 +433,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
 
-		self.mdiArea.setHidden(not False)		
-		self.lineEdit1.setHidden(not False)
+		self.mdiArea.setHidden(not False)
 		self.comboBox2.setHidden(not False)
 		self.pushButton6.setHidden(not False)
 		self.pushButton7.setHidden(not False)
@@ -442,11 +446,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonG.setHidden(not False)
 		self.radioButtonB.setHidden(not False)
 
-		#mostrando itens pertencentes ao menu		
+		#mostrando itens pertencentes ao menu
+		self.lineEdit1.setHidden(False)
+		self.lineEdit1.setEnabled(False)		
 		self.label2.setHidden(False)
 		self.scrollArea1.setHidden(False)		
 		self.label10.setHidden(False)		
-		self.comboBox1.setHidden(False)			
+		self.comboBox1.setHidden(False)	
+		self.pushButton8.setHidden(False)		
 		self.checkBox1.setHidden(not False)		
 
 	def optionReceiveIMAGE(self):
@@ -930,13 +937,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.5, write_timeout=0.5)			
 		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada
-		PARAM_STRING = " " + str(self.lineEdit1.text()) + " "			
+		PARAM_STRING = " "+">"+str(self.lineEdit1.text())+"<"+" "			
 		
 		if(len(PARAM_STRING) > 0):				
 			for i in range(0,len(PARAM_STRING)):
 				self.enviaCaracter(PARAM_STRING[i])				
 		# Fechando conexao serial
 		self.comport.close()
+
+	#funcoes para o receptor em ASCII
+	def recebeCaracter(self):
+		controle_entrada = False		
+		myText = []
+		# Time entre a conexao serial e o tempo para escrever (enviar algo)
+		time.sleep(0.1)
+		VALUE_SERIAL=self.comport.readline()
+		while(VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("<")):
+
+			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada = True
+			elif(controle_entrada == True and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): myText += VALUE_SERIAL[:1] 	
+			# Time entre a conexao serial e o tempo para escrever (enviar algo)
+			time.sleep(0.1)
+			VALUE_SERIAL=self.comport.readline()		
+			#print VALUE_SERIAL						
+		return(''.join(myText))		
+
+	def lerEntradaRecebida(self):		
+		# Iniciando conexao serial		
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.5, write_timeout=0.5)				
+		Frase = self.recebeCaracter()			
+		self.lineEdit1.setText(str(Frase))
+		self.comport.close()
+
+		texto = self._hex_to_binary(self._word_to_hex(self.lineEdit1.text()))	
+		self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista	
+		self.label2.setText(texto)	
+		self.plot_NRZ() 
 
 
 	
