@@ -7,7 +7,7 @@ MCP_CAN CAN(spiCSPin);
 
 void setup()
 {    
-    Serial.begin(9600);
+    Serial.begin(115200);
     CAN.begin(CAN_500KBPS);
 
     /*while (CAN_OK != CAN.begin(CAN_500KBPS))
