@@ -930,14 +930,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	#funcoes para o emissor em ASCII
 	def enviaCaracter(self, PARAM_CARACTER):
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
-		time.sleep(1)
+		time.sleep(0.5)
 		self.comport.write(str.encode(PARAM_CARACTER))		
 
 	def lerEntrada(self):		
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.5, write_timeout=0.5)			
 		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada
-		PARAM_STRING = " "+">"+str(self.lineEdit1.text())+"<"+" "			
+		PARAM_STRING = " " + str(self.lineEdit1.text()) + " "			
 		
 		if(len(PARAM_STRING) > 0):				
 			for i in range(0,len(PARAM_STRING)):
