@@ -930,14 +930,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	#funcoes para o emissor em ASCII
 	def enviaCaracter(self, PARAM_CARACTER):
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
-		time.sleep(0.5)
+		time.sleep(0.010)
 		self.comport.write(str.encode(PARAM_CARACTER))		
 
 	def lerEntrada(self):		
 		# Iniciando conexao serial		
-		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.5, write_timeout=0.5)			
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.010, write_timeout=0.010)			
 		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada
-		PARAM_STRING = " " + str(self.lineEdit1.text()) + " "			
+		PARAM_STRING = " >" + str(self.lineEdit1.text()) + "< "			
 		
 		if(len(PARAM_STRING) > 0):				
 			for i in range(0,len(PARAM_STRING)):
@@ -950,21 +950,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		controle_entrada = False		
 		myText = []
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
-		time.sleep(0.1)
+		time.sleep(0.010)
 		VALUE_SERIAL=self.comport.readline()
 		while(VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("<")):
 
 			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada = True
 			elif(controle_entrada == True and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): myText += VALUE_SERIAL[:1] 	
 			# Time entre a conexao serial e o tempo para escrever (enviar algo)
-			time.sleep(0.1)
+			time.sleep(0.010)
 			VALUE_SERIAL=self.comport.readline()		
 			#print VALUE_SERIAL						
 		return(''.join(myText))		
 
 	def lerEntradaRecebida(self):		
 		# Iniciando conexao serial		
-		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.5, write_timeout=0.5)				
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.010, write_timeout=0.010)				
 		Frase = self.recebeCaracter()			
 		self.lineEdit1.setText(str(Frase))
 		self.comport.close()

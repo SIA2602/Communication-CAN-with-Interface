@@ -45,7 +45,7 @@ void loop()
 
                 digitalWrite(ledPin, buf[i]);
                 ledON = 0;
-                delay(50);
+                delay(10);
             }
             else if((!(ledON)) && i==4)
             {
