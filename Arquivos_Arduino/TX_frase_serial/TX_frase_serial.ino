@@ -7,7 +7,7 @@ MCP_CAN CAN(spiCSPin);
 
 void setup()
 {    
-    Serial.begin(115200);
+    Serial.begin(9600);
     CAN.begin(CAN_500KBPS);
 
     /*while (CAN_OK != CAN.begin(CAN_500KBPS))
@@ -33,7 +33,7 @@ void loop()
   
   //Serial.println("In loop");
   CAN.sendMsgBuf(0x43, 0, 1, c);
-  delay(10);
+  delay(200);
 }
 
 /*void loop()

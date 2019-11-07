@@ -792,6 +792,11 @@
               <string>115200</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>230400</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>

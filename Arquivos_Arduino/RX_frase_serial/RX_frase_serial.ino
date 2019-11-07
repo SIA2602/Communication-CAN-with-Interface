@@ -9,7 +9,7 @@ MCP_CAN CAN(spiCSPin);
 
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(9600);
     pinMode(ledPin,OUTPUT);
 
     while (CAN_OK != CAN.begin(CAN_500KBPS))
@@ -45,7 +45,7 @@ void loop()
 
                 digitalWrite(ledPin, buf[i]);
                 ledON = 0;
-                delay(10);
+                delay(200);
             }
             else if((!(ledON)) && i==4)
             {
