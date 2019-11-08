@@ -768,11 +768,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButton2.setHidden(not False)	#oculta opcao do bit anterior				
 		#valores para grafico	
 		if((self.lineEdit1.text() != "" and len(self.binario) > 0) or (self.checkBoxIMAGE.isChecked() and len(self.binario) > 0)) :	
-			self.y = self.binario
+			self.y = [int(i) for i in self.binario]
 			self.y = [self.y[0]] + self.y
 			self.x = [ i for i in range(len(self.y)) ]
 
-			self.y_bin = self.binario
+			self.y_bin = [int(i) for i in self.binario]
 			self.y_bin = [self.y_bin[0]] + self.y_bin
 			self.x_bin = [ i for i in range(len(self.y_bin)) ]
 
