@@ -160,6 +160,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
 
+		self.pushButton10.setHidden(not False)
+		self.pushButton11.setHidden(not False)
+
 		self.label2.setHidden(not False)		
 		self.lineEdit1.setHidden(not False)
 		self.comboBox1.setHidden(not False)
@@ -290,6 +293,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
 
+		self.pushButton10.setHidden(not False)
+		self.pushButton11.setHidden(not False)
+
 		self.label2.setHidden(not False)		
 		self.lineEdit1.setHidden(not False)
 		self.comboBox1.setHidden(not False)
@@ -375,6 +381,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonG.setHidden(not False)
 		self.radioButtonB.setHidden(not False)
 		self.pushButton8.setHidden(not False)
+		self.pushButton10.setHidden(not False)
+		self.pushButton11.setHidden(not False)
 
 		#mostrando itens pertencentes ao menu
 		self.label2.setHidden(False)		
@@ -414,7 +422,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.mdiArea.setHidden(False)	
 		self.label10.setHidden(False)		
 		self.comboBox1.setHidden(False)			
-		self.pushButton7.setHidden(False)
+		self.pushButton7.setHidden(not False)
+		self.pushButton10.setHidden(False)
+		self.pushButton11.setHidden(not False)
 		self.checkBox6.setHidden(False)		
 		self.labelPORCENTAGEM.setHidden(False)
 		self.spinBoxPORCENTAGEM.setHidden(False)
@@ -432,6 +442,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label1.setHidden(not False)
 		self.pushButton4.setHidden(not False)
 		self.pushButton5.setHidden(not False)
+		self.pushButton10.setHidden(not False)
+		self.pushButton11.setHidden(not False)
 
 		self.mdiArea.setHidden(not False)
 		self.comboBox2.setHidden(not False)
@@ -457,7 +469,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox1.setHidden(not False)		
 
 	def optionReceiveIMAGE(self):
-		self.optionIMAGE()
+		#deixando ativado Imagem e desativando ASCII
+		self.checkBoxIMAGE.setChecked(not False)
+		self.checkBoxASCII.setChecked(False)		
+		#deixando menu grafico disponivel
+		self.fileMenu.setEnabled(not False)
+		self.viewMenu.setEnabled(not False)
+		#ajustando janela
+		self.resize(self.width, self.height)
+		#ocultando menus que nao pertencem ao menu selecionado		
+		self.label1.setHidden(not False)
+		self.pushButton4.setHidden(not False)
+		self.pushButton5.setHidden(not False)					
+		self.lineEdit1.setHidden(not False)		
+		self.comboBox2.setHidden(not False)
+		self.pushButton6.setHidden(not False)		
+		self.checkBox1.setHidden(not False)		
+		self.checkBoxIMAGE.setHidden(not False)
+		self.pushButton8.setHidden(not False)
+
+		#mostrando itens pertencentes ao menu	
+		self.scrollArea1.setHidden(False)
+		self.label2.setHidden(False)
+		self.mdiArea.setHidden(False)	
+		self.label10.setHidden(False)		
+		self.comboBox1.setHidden(False)
+		self.pushButton10.setHidden(not False)
+		self.pushButton11.setHidden(False)			
+		self.pushButton8.setHidden(not False)
+		self.checkBox6.setHidden(not False)		
+		self.labelPORCENTAGEM.setHidden(False)
+		self.spinBoxPORCENTAGEM.setHidden(False)
+		self.labelRGB.setHidden(False)
+		self.radioButtonR.setHidden(False)
+		self.radioButtonG.setHidden(False)
+		self.radioButtonB.setHidden(False)
 
 	def optionASCII(self):
 		#por seguranca deixando menu da serial desabilitado
