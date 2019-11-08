@@ -90,6 +90,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton6.clicked.connect(self.browseASCII)
 		self.pushButton7.clicked.connect(self.lerEntrada)
 		self.pushButton8.clicked.connect(self.lerEntradaRecebida)
+		self.pushButton10.clicked.connect(self.lerEntradaIMG)
+		self.pushButton11.clicked.connect(self.lerEntradaRecebidaIMG)
 		#fixando o tamanho da janela inicial
 		self.resize(self.width, self.height_main)		
 		self.events()
@@ -1047,6 +1049,60 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista	
 		self.label2.setText(texto)	
 		self.plot_NRZ() 
+
+	#funcoes para o emissor em imagem
+	def lerEntradaIMG(self):		
+		# Iniciando conexao serial		
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)	
+		self.strIMAGE = [] #vetor que guardara o valor inteiro da imagem como um char		
+		for i in range(0, len(self.R)):
+			self.strIMAGE.append(hex(self.R[i])[2:])		 
+		#print self.strIMAGE
+		PARAM_STRING = "   "+">" + str(''.join(self.strIMAGE)) + "<"+"   "		
+		print PARAM_STRING	
+		
+		if(len(PARAM_STRING) > 0):				
+			for i in range(0,len(PARAM_STRING)):
+				self.enviaCaracter(PARAM_STRING[i])				
+		# Fechando conexao serial
+		self.comport.close()
+
+	#funcoes para o receptor em imagem
+	def recebeIMG(self):
+		controle_entrada = False		
+		myText = []
+		# Time entre a conexao serial e o tempo para escrever (enviar algo)
+		time.sleep(0.2)
+		VALUE_SERIAL=self.comport.readline()
+		while(VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("<")):
+
+			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada = True
+			elif(controle_entrada == True and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): myText += VALUE_SERIAL[:1] 	
+			# Time entre a conexao serial e o tempo para escrever (enviar algo)
+			time.sleep(0.2)
+			VALUE_SERIAL=self.comport.readline()		
+			#print VALUE_SERIAL						
+		return(''.join(myText))		
+
+	def lerEntradaRecebidaIMG(self):		
+		# Iniciando conexao serial		
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)				
+		Frase = self.recebeIMG()			
+		self.comport.close()
+
+		self.vetorINT = []
+		for i in range(0, len(Frase), 2):
+			self.vetorINT.append(int(Frase[i:i+2], 16))
+		#print self.vetorINT
+
+		self.binario = []
+		self.lineEdit1.clear()
+		#self.lineEdit1.setText(str(self.vetorINT))
+		for i in range(0, len(self.vetorINT)):
+			self.binario += '{0:08b}'.format(self.vetorINT[i])	
+		#print self.binario			
+		self.label2.setText(str(''.join(self.binario)))
+		self.plot_NRZ()
 
 
 	
