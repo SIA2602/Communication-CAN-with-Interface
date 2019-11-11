@@ -1006,12 +1006,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	#funcoes para o emissor em ASCII
 	def enviaCaracter(self, PARAM_CARACTER):
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
-		time.sleep(0.2)
+		time.sleep(0.02)
 		self.comport.write(str.encode(PARAM_CARACTER))		
 
 	def lerEntrada(self):		
 		# Iniciando conexao serial		
-		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)			
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.02, write_timeout=0.02)			
 		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada
 		PARAM_STRING = "   "+">" + str(self.lineEdit1.text()) + "<"+"   "			
 		
@@ -1026,21 +1026,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		controle_entrada = False		
 		myText = []
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
-		time.sleep(0.2)
+		time.sleep(0.02)
 		VALUE_SERIAL=self.comport.readline()
 		while(VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("<")):
 
 			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada = True
 			elif(controle_entrada == True and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): myText += VALUE_SERIAL[:1] 	
 			# Time entre a conexao serial e o tempo para escrever (enviar algo)
-			time.sleep(0.2)
+			time.sleep(0.02)
 			VALUE_SERIAL=self.comport.readline()		
 			#print VALUE_SERIAL						
 		return(''.join(myText))		
 
 	def lerEntradaRecebida(self):		
 		# Iniciando conexao serial		
-		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)				
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.02, write_timeout=0.02)				
 		Frase = self.recebeCaracter()			
 		self.lineEdit1.setText(str(Frase))
 		self.comport.close()
@@ -1053,7 +1053,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	#funcoes para o emissor em imagem
 	def lerEntradaIMG(self):		
 		# Iniciando conexao serial		
-		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)	
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.02, write_timeout=0.02)	
 		self.strIMAGE = [] #vetor que guardara o valor inteiro da imagem como um char		
 		for i in range(0, len(self.R)):
 			self.strIMAGE.append(hex(self.R[i])[2:])		 
@@ -1072,25 +1072,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		controle_entrada = False		
 		myText = []
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
-		time.sleep(0.2)
+		time.sleep(0.02)
 		VALUE_SERIAL=self.comport.readline()
 		while(VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("<")):
 
 			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada = True
 			elif(controle_entrada == True and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): myText += VALUE_SERIAL[:1] 	
 			# Time entre a conexao serial e o tempo para escrever (enviar algo)
-			time.sleep(0.2)
+			time.sleep(0.02)
 			VALUE_SERIAL=self.comport.readline()		
-			#print VALUE_SERIAL						
+			print VALUE_SERIAL						
 		return(''.join(myText))		
 
 	def lerEntradaRecebidaIMG(self):		
 		# Iniciando conexao serial		
-		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)				
+		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.02, write_timeout=0.02)				
 		Frase = self.recebeIMG()			
 		self.comport.close()
 
-		self.vetorINT = []
+		self.vetorINT = [] #vetor servira para recuperar a imagem recebida
 		for i in range(0, len(Frase), 2):
 			self.vetorINT.append(int(Frase[i:i+2], 16))
 		#print self.vetorINT
@@ -1104,6 +1104,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label2.setText(str(''.join(self.binario)))
 		self.plot_NRZ()
 
+		#gerando imagem
+		#self.recuperaIMG()
+
+	def recuperaIMG(self):
+
+		self.vetorIMG = np.zeros((100,100))
+		incremento = 0
+		for i in range(0,100):
+			for j in range(0,100):
+				self.vetorIMG[i][j] = self.vetorINT[j+incremento]
+				incremento += 100
+		image = QImage(fileName)
+		arr2im = Image.fromarray(self.vetorIMG) #convertendo matriz para imagem
 
 	
 if __name__ == '__main__':

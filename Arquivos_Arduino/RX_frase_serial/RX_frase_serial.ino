@@ -12,7 +12,7 @@ void setup()
     Serial.begin(9600);
     pinMode(ledPin,OUTPUT);
 
-    while (CAN_OK != CAN.begin(CAN_500KBPS))
+    while (CAN_OK != CAN.begin(CAN_1000KBPS))
     {
         //Serial.println("CAN BUS Init Failed");
         delay(100);
@@ -45,7 +45,7 @@ void loop()
 
                 digitalWrite(ledPin, buf[i]);
                 ledON = 0;
-                delay(200);
+                delay(20);
             }
             else if((!(ledON)) && i==4)
             {
