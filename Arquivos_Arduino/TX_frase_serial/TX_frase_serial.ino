@@ -33,7 +33,7 @@ void loop()
   
   //Serial.println("In loop");
   CAN.sendMsgBuf(0x43, 0, 1, c);
-  delay(20);
+  delay(200);
 }
 
 /*void loop()
