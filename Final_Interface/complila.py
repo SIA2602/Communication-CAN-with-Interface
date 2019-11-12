@@ -13,7 +13,7 @@ from PIL import Image, ImageFilter
 
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter, QColor
+from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter, QColor, QIcon
 from PyQt5.QtPrintSupport import QPrintDialog, QPrinter
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QScrollArea, QMessageBox, QMainWindow, QMenu, QAction, qApp, QFileDialog, QApplication, QMdiSubWindow
 
@@ -872,6 +872,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		    # fileName = QFileDialog.getOpenFileName(self, "Open File", QDir.currentPath())
 		    fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
 		                                              'Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)
+		    print fileName
 		    if fileName:		    	
 		        image = QImage(fileName)
 		        if image.isNull():
@@ -899,13 +900,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 						#print i,j,r,g,b
 						self.R_envio.append(r)
 						self.G_envio.append(g)
-						self.B_envio.append(b)
+						self.B_envio.append(b)						
 						#para visualizacao grafica
 						if(i < int((self.spinBoxPORCENTAGEM.value()/100.)*image_width)):
 							if(j < int((self.spinBoxPORCENTAGEM.value()/100.)*image_height)):	            		
 								self.R.append(r)
+								if(r == 0): 
+									self.R.append(r)
 								self.G.append(g)
-								self.B.append(b)								      		
+								if(g == 0): 
+									self.G.append(g)
+								self.B.append(b)
+								if(b == 0): 
+									self.B.append(b)								      		
 	            I = np.array(im) #convetendo em vertor numpy	            
 	            arr2im = Image.fromarray(I) #voltando para imagem   
 	            #arr2im.show() #imprimindo imagem
@@ -1055,10 +1062,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)	
 		self.strIMAGE = [] #vetor que guardara o valor inteiro da imagem como um char		
-		for i in range(0, len(self.R)):
-			self.strIMAGE.append(hex(self.R[i])[2:])		 
+		for i in range(0, len(self.R_envio)):
+			self.strIMAGE.append(hex(self.R_envio[i])[2:])
+			if(hex(self.R_envio[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio[i])[2:])		 
 		#print self.strIMAGE
-		PARAM_STRING = "   "+">" + str(''.join(self.strIMAGE)) + "<"+"   "		
+		PARAM_STRING = "   " + ">" + str(''.join(self.strIMAGE)) + "<" + "   "		
 		print PARAM_STRING	
 		
 		if(len(PARAM_STRING) > 0):				
@@ -1094,7 +1102,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		for i in range(0, len(Frase), 2):
 			self.vetorINT.append(int(Frase[i:i+2], 16))
 		#print self.vetorINT
-
+		#print len(self.vetorINT)
 		self.binario = []
 		self.lineEdit1.clear()
 		#self.lineEdit1.setText(str(self.vetorINT))
@@ -1108,15 +1116,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.recuperaIMG()
 
 	def recuperaIMG(self):
-		
-		self.vetorIMG = np.zeros((100,100))
+
+		self.vetorIMG = np.zeros((10,10))
 		incremento = 0
-		for i in range(0,100):
-			for j in range(0,100):
-				self.vetorIMG[i][j] = self.vetorINT[j+incremento]
-				incremento += 100
-		image = QImage(fileName)
-		arr2im = Image.fromarray(self.vetorIMG) #convertendo matriz para imagem
+		for i in range(0,10):
+			for j in range(0,10):
+				self.vetorIMG[i][j] = self.vetorINT[j+incremento]				
+			incremento += 10
+		image = QImage()
+		arr2im = Image.fromarray(self.vetorIMG) #convertendo matriz para imagem		#
+		arr2im.save("recebido","gif")
+
+		self.labelIMAGE.setPixmap(QPixmap('recebido.gif'))		
+		self.scaleFactor = 1.0
+		self.scrollAreaIMAGE.setVisible(True)
+		self.fitToWindowAct.setEnabled(True)
+		self.updateActions()
+		if not self.fitToWindowAct.isChecked():
+			self.labelIMAGE.adjustSize()
+
 
 	
 if __name__ == '__main__':
