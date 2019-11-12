@@ -1105,10 +1105,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.plot_NRZ()
 
 		#gerando imagem
-		#self.recuperaIMG()
+		self.recuperaIMG()
 
 	def recuperaIMG(self):
-
+		
 		self.vetorIMG = np.zeros((100,100))
 		incremento = 0
 		for i in range(0,100):
