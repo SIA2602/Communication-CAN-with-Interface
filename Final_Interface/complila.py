@@ -871,8 +871,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		    options = QFileDialog.Options()
 		    # fileName = QFileDialog.getOpenFileName(self, "Open File", QDir.currentPath())
 		    fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
-		                                              'Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)
-		    print fileName
+		                                              'Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)		    
 		    if fileName:		    	
 		        image = QImage(fileName)
 		        if image.isNull():
@@ -890,20 +889,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		        #carregando a imagem e salvando em lista R,G e B
 	            im = Image.open(fileName)
 	            rgb_im = im.convert('RGB')
-	            image_width = image.width()
-	            image_height = image.height()
+	            self.image_width = image.width()
+	            self.image_height = image.height()
 	            #print image_width, image_height 	            
 	            #guardando imagem de impressao inicial na tela          
-	            for i in range(0,image_width):
-	            	for j in range(0,image_height):
+	            for i in range(0,self.image_width):
+	            	for j in range(0,self.image_height):
 						r,g,b = rgb_im.getpixel((i,j))
 						#print i,j,r,g,b
 						self.R_envio.append(r)
 						self.G_envio.append(g)
 						self.B_envio.append(b)						
 						#para visualizacao grafica
-						if(i < int((self.spinBoxPORCENTAGEM.value()/100.)*image_width)):
-							if(j < int((self.spinBoxPORCENTAGEM.value()/100.)*image_height)):	            		
+						if(i < int((self.spinBoxPORCENTAGEM.value()/100.)*self.image_width)):
+							if(j < int((self.spinBoxPORCENTAGEM.value()/100.)*self.image_height)):	            		
 								self.R.append(r)
 								if(r == 0): 
 									self.R.append(r)
@@ -1066,8 +1065,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.strIMAGE.append(hex(self.R_envio[i])[2:])
 			if(hex(self.R_envio[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio[i])[2:])		 
 		#print self.strIMAGE
-		PARAM_STRING = "   " + ">" + str(''.join(self.strIMAGE)) + "<" + "   "		
-		print PARAM_STRING	
+		PARAM_STRING = "   " + ">" + "0" + hex(self.image_height)[2:] + "0" + hex(self.image_width)[2:] + str(''.join(self.strIMAGE)) + "<" + "   "		
+		#print PARAM_STRING	
 		
 		if(len(PARAM_STRING) > 0):				
 			for i in range(0,len(PARAM_STRING)):
@@ -1115,17 +1114,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		#gerando imagem
 		self.recuperaIMG()
 
-	def recuperaIMG(self):
-
-		self.vetorIMG = np.zeros((10,10))
+	def recuperaIMG(self):	
+		self.vetorIMG = np.zeros((self.vetorINT[0],self.vetorINT[1]))
 		incremento = 0
-		for i in range(0,10):
-			for j in range(0,10):
-				self.vetorIMG[i][j] = self.vetorINT[j+incremento]				
-			incremento += 10
+		for i in range(0,self.vetorINT[0]):
+			for j in range(0,self.vetorINT[1]):
+				self.vetorIMG[i][j] = self.vetorINT[j+incremento+2]				
+			incremento += self.vetorINT[1]
 		image = QImage()
 		arr2im = Image.fromarray(self.vetorIMG) #convertendo matriz para imagem		#
-		arr2im.save("recebido","gif")
+		arr2im.save("recebido.gif")
 
 		self.labelIMAGE.setPixmap(QPixmap('recebido.gif'))		
 		self.scaleFactor = 1.0
