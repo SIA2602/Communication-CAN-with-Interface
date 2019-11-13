@@ -1133,6 +1133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.updateActions()
 		if not self.fitToWindowAct.isChecked():
 			self.labelIMAGE.adjustSize()
+			
 
 	
 if __name__ == '__main__':
