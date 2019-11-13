@@ -439,7 +439,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.labelRGB.setHidden(False)
 		self.radioButtonR.setHidden(False)
 		self.radioButtonG.setHidden(False)
-		self.radioButtonB.setHidden(False)	
+		self.radioButtonB.setHidden(False)				
 
 	def optionReceiveASCII(self):
 		#variavel de controle para a func atualizaOpcoesASCII
@@ -494,7 +494,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton6.setHidden(not False)		
 		self.checkBox1.setHidden(not False)		
 		self.checkBoxIMAGE.setHidden(not False)
-		self.pushButton8.setHidden(not False)
+		self.pushButton8.setHidden(not False)		
 
 		#mostrando itens pertencentes ao menu	
 		self.scrollArea1.setHidden(False)
@@ -506,12 +506,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton11.setHidden(False)			
 		self.pushButton8.setHidden(not False)
 		self.checkBox6.setHidden(not False)		
-		self.labelPORCENTAGEM.setHidden(False)
-		self.spinBoxPORCENTAGEM.setHidden(False)
-		self.labelRGB.setHidden(False)
-		self.radioButtonR.setHidden(False)
-		self.radioButtonG.setHidden(False)
-		self.radioButtonB.setHidden(False)
+		self.labelPORCENTAGEM.setHidden(not False)
+		self.spinBoxPORCENTAGEM.setHidden(not False)
+		self.labelRGB.setHidden(not False)
+		self.radioButtonR.setHidden(not False)
+		self.radioButtonG.setHidden(not False)
+		self.radioButtonB.setHidden(not False)
 
 	def optionASCII(self):
 		#por seguranca deixando menu da serial desabilitado
@@ -534,7 +534,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		#apagando Menu anterior
 		self.pushButton1.setHidden(not False)
 		self.pushButton2.setHidden(not False)
-		self.pushButton3.setHidden(not False)		
+		self.pushButton3.setHidden(not False)			
 		#ativando opcoes do proximo menu		
 		self.label1.setText("Select an Option to Emissor or Receptor")
 		self.pushButton4.setHidden(False)
@@ -1100,12 +1100,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.vetorINT = [] #vetor servira para recuperar a imagem recebida
 		for i in range(0, len(Frase), 2):
 			self.vetorINT.append(int(Frase[i:i+2], 16))
-		#print self.vetorINT
+		print self.vetorINT
 		#print len(self.vetorINT)
 		self.binario = []
 		self.lineEdit1.clear()
 		#self.lineEdit1.setText(str(self.vetorINT))
-		for i in range(0, len(self.vetorINT)):
+		for i in range(2, len(self.vetorINT)):
 			self.binario += '{0:08b}'.format(self.vetorINT[i])	
 		#print self.binario			
 		self.label2.setText(str(''.join(self.binario)))
@@ -1115,12 +1115,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.recuperaIMG()
 
 	def recuperaIMG(self):	
+		print self.vetorINT[0],self.vetorINT[1]
 		self.vetorIMG = np.zeros((self.vetorINT[0],self.vetorINT[1]))
 		incremento = 0
-		for i in range(0,self.vetorINT[0]):
-			for j in range(0,self.vetorINT[1]):
-				self.vetorIMG[i][j] = self.vetorINT[j+incremento+2]				
-			incremento += self.vetorINT[1]
+		for i in range(0,self.vetorINT[1]):
+			for j in range(0,self.vetorINT[0]):
+				self.vetorIMG[j][i] = self.vetorINT[j+incremento+2]				
+			incremento += self.vetorINT[0]
 		image = QImage()
 		arr2im = Image.fromarray(self.vetorIMG) #convertendo matriz para imagem		#
 		arr2im.save("recebido.gif")
