@@ -2,6 +2,7 @@
 
 import time
 import serial
+import random
 
 import sys, os
 import sip #usado para deletar o grafico
@@ -72,8 +73,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.y = []
 		self.x_bin = []
 		self.y_bin = []
+		self.x_noise = []
+		self.y_noise = []
 		self.binario = []
-		self.listaPortas = []
+		self.binario_noise = []		
+		self.listaPortas = []	
 
 		#variaveis para a resolucao da tela
 		self.width = 1080
@@ -267,7 +271,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox2.setHidden(False)
 		self.checkBox3.setHidden(False)
 		self.checkBox4.setHidden(False)
-		self.checkBox5.setHidden(False)
+		if(self.controleReceive == False):
+			self.checkBox5.setHidden(False)
+		else:
+			self.checkBox5.setHidden(True)
 		self.horizontalSlider1.setHidden(False)
 		
 	def functionClearPainel(self):
@@ -507,7 +514,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label10.setHidden(False)		
 		self.comboBox1.setHidden(False)	
 		self.pushButton8.setHidden(False)		
-		self.checkBox1.setHidden(not False)
+		self.checkBox1.setHidden(not False)		
 		self.pushButtonCRC.setHidden(False)		
 		self.pushButtonCRC_IMG.setHidden(not False)		
 		self.labelDeteccao1.setHidden(False)
@@ -738,7 +745,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 					else: self.ax2 = self.figure.add_subplot(211)							
 					#ajustando eixo de visualizacao			
 					self.ax2.set_xlim(start, end)			
-					self.ax2.step(self.x_bin, self.y_bin, color=self.printColor(), linewidth=self.linesWidth()) #opcao ativa imprime grafico	
+					self.ax2.step(self.x_noise, self.y_noise, color=self.printColor(), linewidth=self.linesWidth()) #opcao ativa imprime grafico	
 					self.ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
 					self.ax2.xaxis.set_major_locator(MaxNLocator(integer=True))		
 					self.ax2.xaxis.grid(color='gray', linestyle='--', linewidth=0.5)
@@ -793,16 +800,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if (self.checkBoxIMAGE.isChecked()): self.convertIMAGE_to_Binary_in_label()
 		if (self.lineEdit1.text() != ""):
 			self.pushButtonCRC.setEnabled(not False)
+		if (self.label2.text() != ""):
 			self.pushButtonCRC_IMG.setEnabled(not False)		
 
 	def gravaMensagem(self):
-		global texto		
+		global texto			
 
 		if(self.lineEdit1.text() != ""):			 			
 			texto = self._hex_to_binary(self._word_to_hex(self.lineEdit1.text()))	
 			self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
-			#print self.binario			
-			self.label2.setText(texto)	
+
+			if(len(self.binario) != len(self.binario_noise)):
+				self.lista_ASCII_error = [i for i in self.lineEdit1.text()]
+				#print self.lista_ASCII_error
+				self.noise_ASCII(10)
+				texto = self._hex_to_binary(self._word_to_hex(self.lista_ASCII_error))				
+				self.binario_noise = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+				#print self.binario_noise
+				#print self.binario											
+			self.label2.setText(texto)		
 
 	def ASCII_to_Bin(self, texto):		
 		return bin(int(binascii.hexlify(texto), 16))	
@@ -819,6 +835,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.y_bin = [int(i) for i in self.binario]
 			self.y_bin = [self.y_bin[0]] + self.y_bin
 			self.x_bin = [ i for i in range(len(self.y_bin)) ]
+
+			self.y_noise = [int(i) for i in self.binario_noise]
+			self.y_noise = [self.y_noise[0]] + self.y_noise
+			self.x_noise = [ i for i in range(len(self.y_noise))]
 
 	def plot_NRZ_L(self):
 		#valores para grafico		
@@ -908,8 +928,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.R_envio = []
 		self.G_envio = []
 		self.B_envio = []
-		self.texto = []
-		self.binario = []
+		self.texto = []		
+		self.x_noise = []
+		self.y_noise = []		
+		self.binario_noise = []
 
 		if (self.checkBoxIMAGE.isChecked()):		    
 		    options = QFileDialog.Options()
@@ -1063,8 +1085,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)			
 		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada	
-		value_CRC = CRCCCITT().calculate(str(self.lineEdit1.text()))	
-		PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + str(self.lineEdit1.text()) + "<" + "   "			
+		value_CRC = CRCCCITT().calculate(str(self.lineEdit1.text())) #calculando valor CRC				
+
+		if(self.checkBox6.isChecked()):	
+			PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + str(''.join(self.lista_ASCII_error)) + "<" + "   "
+		else:
+			PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + str(self.lineEdit1.text()) + "<" + "   "			
 		
 		if(len(PARAM_STRING) > 0):				
 			for i in range(0,len(PARAM_STRING)):
@@ -1205,7 +1231,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if(CRCCCITT().calculate(str(''.join(self.myText)[4:])) == self.myCRC):
 			self.label2.setStyleSheet('color: green')
 		else:
-			self.label2.setStyleSheet('color: red')			
+			self.label2.setStyleSheet('color: red')	
+
+	#Insercao de Erro		
+	def noise_ASCII(self, max_):
+		if(len(self.lista_ASCII_error) > 1):
+			noise = np.random.normal(0,max_,100)
+			tam = len(self.lista_ASCII_error)
+
+			var = random.randint(1,tam-1)
+
+			for i in range(0, var):
+				value = random.randint(0, tam-1)
+				value_noise = random.randint(0, 99)
+				aux = abs(ord(self.lista_ASCII_error[value]) + int(noise[value_noise])) 	
+				if(aux == 76 or aux==74):
+					aux = aux + 1
+				self.lista_ASCII_error[value] = chr(aux)		 		
 
 	
 if __name__ == '__main__':

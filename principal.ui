@@ -139,12 +139,12 @@
           </property>
           <item>
            <property name="text">
-            <string>NRZ</string>
+            <string>NRZ-L</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>NRZ-L</string>
+            <string>NRZ</string>
            </property>
           </item>
           <item>

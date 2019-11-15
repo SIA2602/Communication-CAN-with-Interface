@@ -30,6 +30,7 @@ Obs.: Para uma correta execucao do programa, verificar se as bibliotecas minimas
 		-matplotlib
 		-time
 		-sys
+		-PyCRC [https://pycrc.readthedocs.io/en/latest/readme.html]
 	-Execucao do Programa:
 		-Dentro da Pasta Principal digitar no terminal: python compila.py
 		[Obs.: Para Detalhes de como usar o software consultar o menu help ao executar o programa.]
