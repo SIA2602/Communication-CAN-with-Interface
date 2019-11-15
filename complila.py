@@ -11,6 +11,8 @@ import binascii
 
 from PIL import Image, ImageFilter
 
+from PyCRC.CRCCCITT import CRCCCITT #CRC para deteccao de erro
+
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter, QColor, QIcon
@@ -94,6 +96,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton8.clicked.connect(self.lerEntradaRecebida)
 		self.pushButton10.clicked.connect(self.lerEntradaIMG)
 		self.pushButton11.clicked.connect(self.lerEntradaRecebidaIMG)
+		self.pushButtonCRC.clicked.connect(self.verificaCRC_ASCII)
+		self.pushButtonCRC_IMG.clicked.connect(self.verificaCRC_IMG)
 		#fixando o tamanho da janela inicial
 		self.resize(self.width, self.height_main)		
 		self.events()
@@ -173,7 +177,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton10.setHidden(not False)
 		self.pushButton11.setHidden(not False)
 
-		self.label2.setHidden(not False)		
+		self.label2.setHidden(not False)	
+		self.label2.setStyleSheet('color: black')	
 		self.lineEdit1.setHidden(not False)
 		self.comboBox1.setHidden(not False)
 		self.comboBox2.setHidden(not False)		
@@ -190,6 +195,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonR.setHidden(not False)
 		self.radioButtonG.setHidden(not False)
 		self.radioButtonB.setHidden(not False)
+		self.pushButtonCRC.setHidden(not False)		
+		self.pushButtonCRC_IMG.setHidden(not False)		
+		self.labelDeteccao1.setHidden(not False)
+		self.labelDeteccao2.setHidden(not False)
 		
 		self.label5.setHidden(not False)
 		self.label6.setHidden(not False)
@@ -328,6 +337,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonR.setHidden(not False)
 		self.radioButtonG.setHidden(not False)
 		self.radioButtonB.setHidden(not False)
+		self.pushButtonCRC.setHidden(not False)		
+		self.pushButtonCRC_IMG.setHidden(not False)		
+		self.labelDeteccao1.setHidden(not False)
+		self.labelDeteccao2.setHidden(not False)
 		
 		self.label5.setHidden(not False)
 		self.label6.setHidden(not False)
@@ -480,7 +493,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.labelRGB.setHidden(not False)
 		self.radioButtonR.setHidden(not False)
 		self.radioButtonG.setHidden(not False)
-		self.radioButtonB.setHidden(not False)
+		self.radioButtonB.setHidden(not False)	
 
 		#mostrando itens pertencentes ao menu
 		self.lineEdit1.setHidden(False)
@@ -490,7 +503,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label10.setHidden(False)		
 		self.comboBox1.setHidden(False)	
 		self.pushButton8.setHidden(False)		
-		self.checkBox1.setHidden(not False)		
+		self.checkBox1.setHidden(not False)
+		self.pushButtonCRC.setHidden(False)		
+		self.pushButtonCRC_IMG.setHidden(not False)		
+		self.labelDeteccao1.setHidden(False)
+		self.labelDeteccao2.setHidden(not False)		
 
 	def optionReceiveIMAGE(self):
 		#deixando ativado Imagem e desativando ASCII
@@ -528,6 +545,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonR.setHidden(not False)
 		self.radioButtonG.setHidden(not False)
 		self.radioButtonB.setHidden(not False)
+		self.pushButtonCRC_IMG.setHidden(False)		
+		self.pushButtonCRC.setHidden(not False)		
+		self.labelDeteccao1.setHidden(not False)
+		self.labelDeteccao2.setHidden(False)
 
 	def optionASCII(self):
 		#por seguranca deixando menu da serial desabilitado
@@ -1034,8 +1055,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def lerEntrada(self):		
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)			
-		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada
-		PARAM_STRING = "   "+">" + str(self.lineEdit1.text()) + "<"+"   "			
+		#PARAM_STRING="Ola como vai? Oi estou bem, e voce?" #recebe a entrada	
+		value_CRC = CRCCCITT().calculate(str(self.lineEdit1.text()))	
+		PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + str(self.lineEdit1.text()) + "<" + "   "			
 		
 		if(len(PARAM_STRING) > 0):				
 			for i in range(0,len(PARAM_STRING)):
@@ -1045,20 +1067,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	#funcoes para o receptor em ASCII
 	def recebeCaracter(self):
-		controle_entrada = False		
-		myText = []
+		controle_entrada = 0		
+		self.myText = []
+		self.myCRC = []
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
 		time.sleep(0.2)
 		VALUE_SERIAL=self.comport.readline()
 		while(VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("<")):
 
-			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada = True
-			elif(controle_entrada == True and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): myText += VALUE_SERIAL[:1] 	
+			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada += 1
+			elif(controle_entrada == 1 and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): self.myCRC += VALUE_SERIAL[:1]
+			elif(controle_entrada == 2 and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): self.myText += VALUE_SERIAL[:1] 	
 			# Time entre a conexao serial e o tempo para escrever (enviar algo)
 			time.sleep(0.2)
 			VALUE_SERIAL=self.comport.readline()		
-			#print VALUE_SERIAL						
-		return(''.join(myText))		
+			#print VALUE_SERIAL
+		self.myCRC = int(''.join(self.myCRC))	
+		#print myText
+		#print CRCCCITT().calculate(str(''.join(myText)))
+		self.label2.setStyleSheet('color: black')					
+		return(''.join(self.myText))		
 
 	def lerEntradaRecebida(self):		
 		# Iniciando conexao serial		
@@ -1081,7 +1109,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.strIMAGE.append(hex(self.R_envio[i])[2:])
 			if(hex(self.R_envio[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio[i])[2:])		 
 		#print self.strIMAGE
-		PARAM_STRING = "   " + ">" + "0" + hex(self.image_height)[2:] + "0" + hex(self.image_width)[2:] + str(''.join(self.strIMAGE)) + "<" + "   "		
+		value_CRC = CRCCCITT().calculate(str(''.join(self.strIMAGE)))
+		if(self.image_height <= 10 or self.image_width <= 10):
+			PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + "0" + hex(self.image_height)[2:] + "0" + hex(self.image_width)[2:] + str(''.join(self.strIMAGE)) + "<" + "   "	
+		else:
+			PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + hex(self.image_height)[2:] + hex(self.image_width)[2:] + str(''.join(self.strIMAGE)) + "<" + "   "		
 		#print PARAM_STRING	
 		
 		if(len(PARAM_STRING) > 0):				
@@ -1092,20 +1124,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	#funcoes para o receptor em imagem
 	def recebeIMG(self):
-		controle_entrada = False		
-		myText = []
+		controle_entrada = 0		
+		self.myText = []
+		self.myCRC = []
 		# Time entre a conexao serial e o tempo para escrever (enviar algo)
 		time.sleep(0.2)
 		VALUE_SERIAL=self.comport.readline()
 		while(VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("<")):
 
-			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada = True
-			elif(controle_entrada == True and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): myText += VALUE_SERIAL[:1] 	
+			if(VALUE_SERIAL.encode("hex")[:2] == self._word_to_hex(">")): controle_entrada += 1
+			elif(controle_entrada == 1 and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): self.myCRC += VALUE_SERIAL[:1] 
+			elif(controle_entrada == 2 and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): self.myText += VALUE_SERIAL[:1] 	
 			# Time entre a conexao serial e o tempo para escrever (enviar algo)
 			time.sleep(0.2)
 			VALUE_SERIAL=self.comport.readline()		
-			#print VALUE_SERIAL						
-		return(''.join(myText))		
+			#print VALUE_SERIAL
+		self.myCRC = int(''.join(self.myCRC))
+		#print self.myCRC
+		#print CRCCCITT().calculate(str(''.join(self.myText)[4:]))						
+		return(''.join(self.myText))		
 
 	def lerEntradaRecebidaIMG(self):		
 		# Iniciando conexao serial		
@@ -1116,7 +1153,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.vetorINT = [] #vetor servira para recuperar a imagem recebida
 		for i in range(0, len(Frase), 2):
 			self.vetorINT.append(int(Frase[i:i+2], 16))
-		print self.vetorINT
+		#print self.vetorINT
 		#print len(self.vetorINT)
 		self.binario = []
 		self.lineEdit1.clear()
@@ -1131,7 +1168,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.recuperaIMG()
 
 	def recuperaIMG(self):	
-		print self.vetorINT[0],self.vetorINT[1]
+		#print self.vetorINT[0],self.vetorINT[1]
 		self.vetorIMG = np.zeros((self.vetorINT[0],self.vetorINT[1]))
 		incremento = 0
 		for i in range(0,self.vetorINT[1]):
@@ -1149,7 +1186,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.updateActions()
 		if not self.fitToWindowAct.isChecked():
 			self.labelIMAGE.adjustSize()
-			
+
+	#Deteccao de Erros
+	def verificaCRC_ASCII(self):
+		if(CRCCCITT().calculate(str(''.join(self.myText))) == self.myCRC):
+			self.label2.setStyleSheet('color: green')
+		else:
+			self.label2.setStyleSheet('color: red')	
+	
+	def verificaCRC_IMG(self):
+		if(CRCCCITT().calculate(str(''.join(self.myText)[4:])) == self.myCRC):
+			self.label2.setStyleSheet('color: green')
+		else:
+			self.label2.setStyleSheet('color: red')			
 
 	
 if __name__ == '__main__':
