@@ -24,6 +24,8 @@ import matplotlib.pyplot as plt
 
 from returnSerialPort import serialPorts
 
+from help import Help
+
 Ui_MainWindow, QtBaseClass = uic.loadUiType("principal.ui")
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -54,7 +56,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		#self.mdi = QMdiArea()      	
 		self.sub = QMdiSubWindow()
 		self.sub.setWidget(self.scrollAreaIMAGE)
-		self.sub.resize(600,400)
+		self.sub.resize(400,400)
 		self.sub.setWindowTitle("Image Viewer")
 		self.mdiArea.addSubWindow(self.sub)
 		#criando menus para imagem
@@ -274,19 +276,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.checkBox3.setHidden(not False)
 		self.checkBox4.setHidden(not False)
 		self.checkBox5.setHidden(not False)
-		self.horizontalSlider1.setHidden(not False)		
+		self.horizontalSlider1.setHidden(not False)			
+
+	@staticmethod
+	def open_help():		
+		Help().exec_()  
 		
 	def actions(self):	
 		#carregando porta serial
 		self.recebePortasSeriais()
 		#print self.listaPortas			
 		if(len(self.listaPortas) > 0): self.serialPort = QAction("&"+self.listaPortas[0], self, triggered=self.selectSerialPort)	
-		else: self.serialPort = QAction("&no serial ports", self, triggered=self.unselectSerialPort)	
+		else: self.serialPort = QAction("&no serial ports", self, triggered=self.unselectSerialPort)
 		self.Main = QAction("&Main...", self, shortcut="Ctrl+M", triggered=self.activateMain)
 		self.viewGraph = QAction("&View Graph", self, shortcut="Ctrl+G", triggered=self.functionViewsGraph)	
 		self.clearGraph = QAction("&Clear Graph", self, shortcut="Ctrl+K", triggered=self.functionClearGraph)
 		self.viewPainel = QAction("&View customization panel", self, shortcut="Ctrl+P", triggered=self.functionViewPainel)	
 		self.clearPainel = QAction("&Clear customization panel", self, shortcut="Ctrl+L", triggered=self.functionClearPainel)
+		self.instrucoes = QAction("&Uso do Software", self, shortcut="Ctrl+H", triggered=self.open_help)
 	
 	def incializationMain(self):
 		#variavel de controle para a func atualizaOpcoesASCII
@@ -366,7 +373,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.tools.addSeparator()		
 		self.returnMain = self.tools.addMenu(" Return Main ")
 		self.returnMain.addAction(self.Main)        
-		self.tools.addSeparator()		
+		self.tools.addSeparator()
+
+		#criando menu help
+		self.help = QMenu("&Help", self)
+		self.menuBar().addMenu(self.help)
+		self.help.addSeparator()
+
+		self.selectHelp = self.help.addMenu(" Instrucoes de Uso ")
+		self.selectHelp.addAction(self.instrucoes)		
+		self.help.addSeparator()		
 
 	def optionSendASCII(self):
 		#deixando ativado ASCII e sativando Imagem
@@ -870,10 +886,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if (self.checkBoxIMAGE.isChecked()):		    
 		    options = QFileDialog.Options()
 		    # fileName = QFileDialog.getOpenFileName(self, "Open File", QDir.currentPath())
-		    fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
-		                                              'Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)		    
-		    if fileName:		    	
-		        image = QImage(fileName)
+		    fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '','Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)
+
+		    if(fileName != ' '):		    	
+		        image = QImage(fileName)		        
 		        if image.isNull():
 		            QMessageBox.information(self, "Image Viewer", "Cannot load %s." % fileName)
 		            return		            
