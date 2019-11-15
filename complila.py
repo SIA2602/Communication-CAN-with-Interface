@@ -196,9 +196,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonG.setHidden(not False)
 		self.radioButtonB.setHidden(not False)
 		self.pushButtonCRC.setHidden(not False)		
-		self.pushButtonCRC_IMG.setHidden(not False)		
+		self.pushButtonCRC_IMG.setHidden(not False)
+		self.pushButtonCRC.setEnabled(False)
+		self.pushButtonCRC_IMG.setEnabled(False)		
 		self.labelDeteccao1.setHidden(not False)
-		self.labelDeteccao2.setHidden(not False)
+		self.labelDeteccao2.setHidden(not False)		
 		
 		self.label5.setHidden(not False)
 		self.label6.setHidden(not False)
@@ -338,7 +340,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.radioButtonG.setHidden(not False)
 		self.radioButtonB.setHidden(not False)
 		self.pushButtonCRC.setHidden(not False)		
-		self.pushButtonCRC_IMG.setHidden(not False)		
+		self.pushButtonCRC_IMG.setHidden(not False)
+		self.pushButtonCRC.setEnabled(False)
+		self.pushButtonCRC_IMG.setEnabled(False)		
 		self.labelDeteccao1.setHidden(not False)
 		self.labelDeteccao2.setHidden(not False)
 		
@@ -786,7 +790,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.gravaMensagem()	
 		self.actions()	
 		if (self.checkBoxASCII.isChecked()): self.atualizaOpcoesASCII()
-		if (self.checkBoxIMAGE.isChecked()): self.convertIMAGE_to_Binary_in_label()		
+		if (self.checkBoxIMAGE.isChecked()): self.convertIMAGE_to_Binary_in_label()
+		if (self.lineEdit1.text() != ""):
+			self.pushButtonCRC.setEnabled(not False)
+			self.pushButtonCRC_IMG.setEnabled(not False)		
 
 	def gravaMensagem(self):
 		global texto		

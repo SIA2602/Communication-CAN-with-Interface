@@ -1,8 +1,0 @@
--> Criado a Interface no Qt-Design o proximo passo é gerar uma arquivo python.
-	pyuic5 nomeArquivo.ui > nomeArquivo.py
-	
--> Para Rodar a Interface:
-	pyuic5 -x untitled.ui -o untitled.py
-	python untitled.py
-	
-	onde untitled eh o nome do arquivo dado pelo programador
