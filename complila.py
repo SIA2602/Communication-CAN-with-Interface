@@ -283,7 +283,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if(self.controleReceive == False):
 			self.checkBox5.setHidden(False)
 		else:
-			self.checkBox5.setHidden(True)
+			self.checkBox5.setHidden(not False)
 		self.horizontalSlider1.setHidden(False)
 		
 	def functionClearPainel(self):
@@ -1206,10 +1206,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)	
 		self.strIMAGE = [] #vetor que guardara o valor inteiro da imagem como um char		
 		for i in range(0, len(self.R_envio)):
-			self.strIMAGE.append(hex(self.R_envio[i])[2:])
-			if(hex(self.R_envio[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio[i])[2:])		 
+			if(self.checkBox6.isChecked()):	
+				self.strIMAGE.append(hex(self.R_envio_noise[i])[2:])
+				if(hex(self.R_envio_noise[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio_noise[i])[2:])	
+			else:
+				self.strIMAGE.append(hex(self.R_envio[i])[2:])
+				if(hex(self.R_envio[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio[i])[2:])
+						 
 		#print self.strIMAGE
 		value_CRC = CRCCCITT().calculate(str(''.join(self.strIMAGE)))
+
 		if(self.image_height <= 10 or self.image_width <= 10):
 			PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + "0" + hex(self.image_height)[2:] + "0" + hex(self.image_width)[2:] + str(''.join(self.strIMAGE)) + "<" + "   "	
 		else:
