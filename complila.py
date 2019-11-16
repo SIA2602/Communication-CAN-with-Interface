@@ -43,9 +43,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.R = []
 		self.G = []
 		self.B = []
+		self.R_noise = []
+		self.G_noise = []
+		self.B_noise = []
 		self.R_envio = []
 		self.G_envio = []
 		self.B_envio = []
+		self.R_envio_noise = []
+		self.G_envio_noise = []
+		self.B_envio_noise = []
 		#criando o label da imagem
 		self.labelIMAGE = QLabel()		
 		self.labelIMAGE.setBackgroundRole(QPalette.Base)
@@ -149,6 +155,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.R_envio = []
 		self.G_envio = []
 		self.B_envio = []
+		self.R_envio_noise = []
+		self.G_envio_noise = []
+		self.B_envio_noise = []
 		self.texto = []
 		self.binario = []
 		#deixando menu grafico indisponivel
@@ -830,15 +839,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if((self.lineEdit1.text() != "" and len(self.binario) > 0) or (self.checkBoxIMAGE.isChecked() and len(self.binario) > 0)) :	
 			self.y = [int(i) for i in self.binario]
 			self.y = [self.y[0]] + self.y
-			self.x = [ i for i in range(len(self.y)) ]
+			self.x = [ int(i) for i in range(len(self.y)) ]
 
 			self.y_bin = [int(i) for i in self.binario]
 			self.y_bin = [self.y_bin[0]] + self.y_bin
-			self.x_bin = [ i for i in range(len(self.y_bin)) ]
+			self.x_bin = [ int(i) for i in range(len(self.y_bin)) ]
 
-			self.y_noise = [int(i) for i in self.binario_noise]
-			self.y_noise = [self.y_noise[0]] + self.y_noise
-			self.x_noise = [ i for i in range(len(self.y_noise))]
+			if(len(self.binario_noise) > 0):
+				self.y_noise = [int(i) for i in self.binario_noise]
+				self.y_noise = [self.y_noise[0]] + self.y_noise
+				self.x_noise = [ int(i) for i in range(len(self.y_noise))]
 
 	def plot_NRZ_L(self):
 		#valores para grafico		
@@ -922,6 +932,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.labelIMAGE.clear()
 		self.x = []
 		self.y = []
+		self.x_bin = []
+		self.y_bin = []		
 		self.R = []
 		self.G = []
 		self.B = []
@@ -930,8 +942,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.B_envio = []
 		self.texto = []		
 		self.x_noise = []
-		self.y_noise = []		
+		self.y_noise = []	
+		self.binario = []	
 		self.binario_noise = []
+		self.R_noise = []
+		self.G_noise = []
+		self.B_noise = []		
+		self.R_envio_noise = []
+		self.G_envio_noise = []
+		self.B_envio_noise = []
 
 		if (self.checkBoxIMAGE.isChecked()):		    
 		    options = QFileDialog.Options()
@@ -965,33 +984,62 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 						#print i,j,r,g,b
 						self.R_envio.append(r)
 						self.G_envio.append(g)
-						self.B_envio.append(b)						
-						#para visualizacao grafica
-						if(i < int((self.spinBoxPORCENTAGEM.value()/100.)*self.image_width)):
-							if(j < int((self.spinBoxPORCENTAGEM.value()/100.)*self.image_height)):	            		
-								self.R.append(r)
-								if(r == 0): 
-									self.R.append(r)
-								self.G.append(g)
-								if(g == 0): 
-									self.G.append(g)
-								self.B.append(b)
-								if(b == 0): 
-									self.B.append(b)								      		
+						self.B_envio.append(b)														      		
 	            I = np.array(im) #convetendo em vertor numpy	            
 	            arr2im = Image.fromarray(I) #voltando para imagem   
 	            #arr2im.show() #imprimindo imagem
-	            #print self.return_bin(self._hex_to_binary(hex(R[0])[2:]))	                       
+	            #print self.return_bin(self._hex_to_binary(hex(R[0])[2:]))
+
+	            self.R = self.R_envio[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio))]
+	            self.G = self.G_envio[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.G_envio))]
+	            self.B = self.B_envio[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.B_envio))]
+
+	            if(self.R == self.G == self.B):
+		            self.lista_ASCII_error = self.R_envio
+		            self.noise_img(10)
+		            self.R_envio_noise = self.lista_ASCII_error
+		            self.G_envio_noise = self.lista_ASCII_error
+		            self.B_envio_noise = self.lista_ASCII_error
+		            self.R_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
+		            self.G_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
+		            self.B_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
+
+	            else:
+	            	self.lista_ASCII_error = self.R_envio
+	            	self.noise_img(10)
+	            	self.R_envio_noise = self.lista_ASCII_error
+	            	self.R_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
+
+	            	self.lista_ASCII_error = self.G_envio
+	            	self.noise_img(10)
+	            	self.G_envio_noise = self.lista_ASCII_error
+	            	self.G_noise = self.G_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.G_envio_noise))]
+
+	            	self.lista_ASCII_error = self.B_envio
+	            	self.noise_img(10)
+	            	self.B_envio_noise = self.lista_ASCII_error
+	            	self.B_noise = self.B_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.B_envio_noise))] 
 
 	def convertIMAGE_to_Binary_in_label(self):		
 		if(self.radioButtonR.isChecked()):
 			if(len(self.R) > 0):
-				texto = self._hex_to_binary([hex(x)[2:] for x in self.R])	
+				texto = self._hex_to_binary([hex(x)[2:] for x in self.R])				
+				#print self.R	
 				self.binario = []
-				self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
-				#print self.binario			
+				self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista				
+				#print self.texto			
 				self.label2.setText(texto)
-				self.plot_NRZ()
+
+				texto = self._hex_to_binary([hex(x)[2:] for x in self.R_noise])	
+
+				if(len(texto) > len(self.binario)):
+					texto = texto[:len(self.binario)]
+				elif(len(texto) < len(self.binario)):
+					self.binario = self.binario[:len(texto)]
+
+				self.binario_noise = self.return_bin(texto) #pegando valores binario e jogando em uma lista				
+				self.plot_NRZ()				
+
 		elif(self.radioButtonG.isChecked()):
 			if(len(self.G) > 0):
 				texto = self._hex_to_binary([hex(x)[2:] for x in self.G])
@@ -999,7 +1047,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
 				#print self.binario			
 				self.label2.setText(texto)
+
+				texto = self._hex_to_binary([hex(x)[2:] for x in self.G_noise])
+
+				if(len(texto) > len(self.binario)):
+					texto = texto[:len(self.binario)]
+				elif(len(texto) < len(self.binario)):
+					self.binario = self.binario[:len(texto)]
+
+				self.binario_noise = self.return_bin(texto) #pegando valores binario e jogando em uma lista
 				self.plot_NRZ()
+
 		elif(self.radioButtonB.isChecked()):
 			if(len(self.B) > 0):
 				texto = self._hex_to_binary([hex(x)[2:] for x in self.B])	
@@ -1007,7 +1065,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
 				#print self.binario			
 				self.label2.setText(texto)
-				self.plot_NRZ() 
+
+				texto = self._hex_to_binary([hex(x)[2:] for x in self.B_noise])	
+
+				if(len(texto) > len(self.binario)):
+					texto = texto[:len(self.binario)]
+				elif(len(texto) < len(self.binario)):
+					self.binario = self.binario[:len(texto)]
+
+				self.binario_noise = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+				self.plot_NRZ()				
 
 	def functionViewsImage(self):
 		#ajustando janela
@@ -1236,7 +1303,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	#Insercao de Erro		
 	def noise_ASCII(self, max_):
 		if(len(self.lista_ASCII_error) > 1):
-			noise = np.random.normal(0,max_,100)
+			noise = np.random.normal(0, max_, 100)
 			tam = len(self.lista_ASCII_error)
 
 			var = random.randint(1,tam-1)
@@ -1245,9 +1312,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				value = random.randint(0, tam-1)
 				value_noise = random.randint(0, 99)
 				aux = abs(ord(self.lista_ASCII_error[value]) + int(noise[value_noise])) 	
-				if(aux == 76 or aux==74):
+				if(aux == 76 or aux == 74):
 					aux = aux + 1
-				self.lista_ASCII_error[value] = chr(aux)		 		
+				self.lista_ASCII_error[value] = chr(aux)	
+
+	def noise_img(self,max_):
+		if(len(self.lista_ASCII_error) > 1):
+			noise = np.random.normal(0, max_, 100)
+			tam = len(self.lista_ASCII_error)
+
+			var = random.randint(1, tam-1)
+
+			for i in range(0,var):
+				value = random.randint(0, tam-1)
+				value_noise = random.randint(0, 99)
+				aux = abs(self.lista_ASCII_error[value] + int(noise[value_noise])) 	
+				if(aux > 255):
+					aux = 255 
+				self.lista_ASCII_error[value] = aux	 		
 
 	
 if __name__ == '__main__':
