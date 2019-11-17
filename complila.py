@@ -1006,21 +1006,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		            self.G_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
 		            self.B_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
 
-	            #else:
-	            #	self.lista_ASCII_error = self.R_envio
-	            #	self.noise_img(10)
-	            #	self.R_envio_noise = self.lista_ASCII_error
-	            #	self.R_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
+	            else:
+	            	self.lista_ASCII_error = self.R_envio[:]
+	            	self.noise_img(10)
+	            	self.R_envio_noise = self.lista_ASCII_error[:]
+	            	self.R_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
 
-	            #	self.lista_ASCII_error = self.G_envio
-	            #	self.noise_img(10)
-	            #	self.G_envio_noise = self.lista_ASCII_error
-	            #	self.G_noise = self.G_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.G_envio_noise))]
+	            	self.lista_ASCII_error = self.G_envio[:]
+	            	self.noise_img(10)
+	            	self.G_envio_noise = self.lista_ASCII_error[:]
+	            	self.G_noise = self.G_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.G_envio_noise))]
 
-	            #	self.lista_ASCII_error = self.B_envio
-	            #	self.noise_img(10)
-	            #	self.B_envio_noise = self.lista_ASCII_error
-	            #	self.B_noise = self.B_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.B_envio_noise))] 
+	            	self.lista_ASCII_error = self.B_envio[:]
+	            	self.noise_img(10)
+	            	self.B_envio_noise = self.lista_ASCII_error[:]
+	            	self.B_noise = self.B_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.B_envio_noise))] 
 
 	def convertIMAGE_to_Binary_in_label(self):		
 		if(self.radioButtonR.isChecked()):
@@ -1222,7 +1222,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			if(hex(self.R_envio[i])[2:] == '0'): list_check_CRC.append(hex(self.R_envio[i])[2:])
 
 		#print len(self.strIMAGE)
-		print ''.join(self.strIMAGE)
+		#print ''.join(self.strIMAGE)
 		value_CRC = CRCCCITT().calculate(str(''.join(list_check_CRC)))
 		if(self.image_height <= 10 or self.image_width <= 10):
 			PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + "0" + hex(self.image_height)[2:] + "0" + hex(self.image_width)[2:] + str(''.join(self.strIMAGE)) + "<" + "   "	
