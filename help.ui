@@ -6,25 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1080</width>
+    <width>1150</width>
     <height>720</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1080</width>
-    <height>720</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>1080</width>
+    <width>1150</width>
     <height>720</height>
    </size>
   </property>
@@ -32,7 +26,7 @@
    <string>Help</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(241, 241, 231);</string>
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -48,7 +42,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>50</height>
+         <height>70</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -71,8 +65,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>1062</width>
-          <height>46</height>
+          <width>1132</width>
+          <height>66</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -96,8 +90,19 @@
              <height>30</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(241, 241, 231);</string>
+           </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -106,16 +111,54 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label1">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QScrollArea" name="scrollArea_2">
+       <property name="widgetResizable">
+        <bool>true</bool>
        </property>
-       <property name="text">
-        <string/>
-       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>1132</width>
+          <height>584</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QLabel" name="label1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <italic>false</italic>
+             <underline>false</underline>
+             <strikeout>false</strikeout>
+            </font>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <property name="openExternalLinks">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </item>
      <item>
@@ -138,6 +181,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushButton1">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(241, 241, 231);</string>
+         </property>
          <property name="text">
           <string>&lt;</string>
          </property>
@@ -145,6 +191,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushButton2">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(241, 241, 231);</string>
+         </property>
          <property name="text">
           <string>&gt;</string>
          </property>

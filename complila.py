@@ -3,6 +3,7 @@
 import time
 import serial
 import random
+import copy
 
 import sys, os
 import sip #usado para deletar o grafico
@@ -994,31 +995,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	            self.G = self.G_envio[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.G_envio))]
 	            self.B = self.B_envio[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.B_envio))]
 
-	            if(self.R == self.G == self.B):
-		            self.lista_ASCII_error = self.R_envio
+	            if(self.R == self.G == self.B):	            	
+		            self.lista_ASCII_error = self.R_envio[:]
 		            self.noise_img(10)
-		            self.R_envio_noise = self.lista_ASCII_error
-		            self.G_envio_noise = self.lista_ASCII_error
-		            self.B_envio_noise = self.lista_ASCII_error
+		            self.R_envio_noise = self.lista_ASCII_error[:]
+		            print len(self.R_envio_noise)
+		            self.G_envio_noise = self.lista_ASCII_error[:]
+		            self.B_envio_noise = self.lista_ASCII_error[:]
 		            self.R_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
 		            self.G_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
 		            self.B_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
 
-	            else:
-	            	self.lista_ASCII_error = self.R_envio
-	            	self.noise_img(10)
-	            	self.R_envio_noise = self.lista_ASCII_error
-	            	self.R_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
+	            #else:
+	            #	self.lista_ASCII_error = self.R_envio
+	            #	self.noise_img(10)
+	            #	self.R_envio_noise = self.lista_ASCII_error
+	            #	self.R_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
 
-	            	self.lista_ASCII_error = self.G_envio
-	            	self.noise_img(10)
-	            	self.G_envio_noise = self.lista_ASCII_error
-	            	self.G_noise = self.G_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.G_envio_noise))]
+	            #	self.lista_ASCII_error = self.G_envio
+	            #	self.noise_img(10)
+	            #	self.G_envio_noise = self.lista_ASCII_error
+	            #	self.G_noise = self.G_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.G_envio_noise))]
 
-	            	self.lista_ASCII_error = self.B_envio
-	            	self.noise_img(10)
-	            	self.B_envio_noise = self.lista_ASCII_error
-	            	self.B_noise = self.B_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.B_envio_noise))] 
+	            #	self.lista_ASCII_error = self.B_envio
+	            #	self.noise_img(10)
+	            #	self.B_envio_noise = self.lista_ASCII_error
+	            #	self.B_noise = self.B_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.B_envio_noise))] 
 
 	def convertIMAGE_to_Binary_in_label(self):		
 		if(self.radioButtonR.isChecked()):
@@ -1204,18 +1206,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def lerEntradaIMG(self):		
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)	
-		self.strIMAGE = [] #vetor que guardara o valor inteiro da imagem como um char		
+		self.strIMAGE = [] #vetor que guardara o valor inteiro da imagem como um char
+		#print len(self.R_envio_noise)
+		#print len(self.R_envio)	
+		#print self.R	
+		list_check_CRC = []
 		for i in range(0, len(self.R_envio)):
 			if(self.checkBox6.isChecked()):	
 				self.strIMAGE.append(hex(self.R_envio_noise[i])[2:])
 				if(hex(self.R_envio_noise[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio_noise[i])[2:])	
-			else:
+			else:	
 				self.strIMAGE.append(hex(self.R_envio[i])[2:])
-				if(hex(self.R_envio[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio[i])[2:])
-						 
-		#print self.strIMAGE
-		value_CRC = CRCCCITT().calculate(str(''.join(self.strIMAGE)))
+				if(hex(self.R_envio[i])[2:] == '0'): self.strIMAGE.append(hex(self.R_envio[i])[2:])	 
+			list_check_CRC.append(hex(self.R_envio[i])[2:])
+			if(hex(self.R_envio[i])[2:] == '0'): list_check_CRC.append(hex(self.R_envio[i])[2:])
 
+		#print len(self.strIMAGE)
+		print ''.join(self.strIMAGE)
+		value_CRC = CRCCCITT().calculate(str(''.join(list_check_CRC)))
 		if(self.image_height <= 10 or self.image_width <= 10):
 			PARAM_STRING = "   " + ">" + str(value_CRC) + ">" + "0" + hex(self.image_height)[2:] + "0" + hex(self.image_width)[2:] + str(''.join(self.strIMAGE)) + "<" + "   "	
 		else:
@@ -1243,8 +1251,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			elif(controle_entrada == 2 and (VALUE_SERIAL.encode("hex")[:2] != self._word_to_hex("\n"))): self.myText += VALUE_SERIAL[:1] 	
 			# Time entre a conexao serial e o tempo para escrever (enviar algo)
 			time.sleep(0.2)
-			VALUE_SERIAL=self.comport.readline()		
-			#print VALUE_SERIAL
+			VALUE_SERIAL=self.comport.readline()
+		#print len(self.myText)		
+		#print ''.join(self.myText)
 		self.myCRC = int(''.join(self.myCRC))
 		#print self.myCRC
 		#print CRCCCITT().calculate(str(''.join(self.myText)[4:]))						
@@ -1253,14 +1262,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def lerEntradaRecebidaIMG(self):		
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)				
-		Frase = self.recebeIMG()			
+		Frase = self.recebeIMG()
+		print Frase
+		print len(Frase)			
 		self.comport.close()
 
 		self.vetorINT = [] #vetor servira para recuperar a imagem recebida
 		for i in range(0, len(Frase), 2):
 			self.vetorINT.append(int(Frase[i:i+2], 16))
-		#print self.vetorINT
-		#print len(self.vetorINT)
+		print self.vetorINT
+		print len(self.vetorINT)
 		self.binario = []
 		self.lineEdit1.clear()
 		#self.lineEdit1.setText(str(self.vetorINT))
@@ -1274,7 +1285,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.recuperaIMG()
 
 	def recuperaIMG(self):	
-		#print self.vetorINT[0],self.vetorINT[1]
+		print len(self.vetorINT)
+		print self.vetorINT[0],self.vetorINT[1]
 		self.vetorIMG = np.zeros((self.vetorINT[0],self.vetorINT[1]))
 		incremento = 0
 		for i in range(0,self.vetorINT[1]):
@@ -1333,7 +1345,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				value = random.randint(0, tam-1)
 				value_noise = random.randint(0, 99)
 				aux = abs(self.lista_ASCII_error[value] + int(noise[value_noise])) 	
-				if(aux > 255):
+				if(aux > 255 or aux < 150):
 					aux = 255 
 				self.lista_ASCII_error[value] = aux	 		
 
