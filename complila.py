@@ -125,7 +125,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.label1.setText("Select an Option to Emissor or Receptor")		
 		self.pushButton1.setEnabled(not False)
 		self.pushButton2.setEnabled(not False)
-		self.pushButton3.setEnabled(not False)
+		self.pushButton3.setEnabled(False)
 
 	def unselectSerialPort(self):		
 		return
@@ -994,12 +994,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	            self.R = self.R_envio[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio))]
 	            self.G = self.G_envio[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.G_envio))]
 	            self.B = self.B_envio[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.B_envio))]
+	            #print self.R_envio
+	            #print len(self.R_envio)
 
 	            if(self.R == self.G == self.B):	            	
 		            self.lista_ASCII_error = self.R_envio[:]
 		            self.noise_img(10)
 		            self.R_envio_noise = self.lista_ASCII_error[:]
-		            print len(self.R_envio_noise)
+		            #print len(self.R_envio_noise)
 		            self.G_envio_noise = self.lista_ASCII_error[:]
 		            self.B_envio_noise = self.lista_ASCII_error[:]
 		            self.R_noise = self.R_envio_noise[:int((self.spinBoxPORCENTAGEM.value()/100.)*len(self.R_envio_noise))]
@@ -1263,39 +1265,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		# Iniciando conexao serial		
 		self.comport = serial.Serial(self.listaPortas[0], self.comboBox1.currentText(), timeout=0.2, write_timeout=0.2)				
 		Frase = self.recebeIMG()
-		print Frase
-		print len(Frase)			
+		#print Frase
+		#print len(Frase)			
 		self.comport.close()
 
 		self.vetorINT = [] #vetor servira para recuperar a imagem recebida
 		for i in range(0, len(Frase), 2):
 			self.vetorINT.append(int(Frase[i:i+2], 16))
-		print self.vetorINT
-		print len(self.vetorINT)
-		self.binario = []
-		self.lineEdit1.clear()
-		#self.lineEdit1.setText(str(self.vetorINT))
-		for i in range(2, len(self.vetorINT)):
-			self.binario += '{0:08b}'.format(self.vetorINT[i])	
-		#print self.binario			
-		self.label2.setText(str(''.join(self.binario)))
+		#print self.vetorINT
+		#print len(self.vetorINT)	
+
+		list_aux = self.vetorINT[2:]
+		texto = self._hex_to_binary([hex(x)[2:] for x in list_aux])
+		self.binario = []	
+		self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
+		#print self.binario					
+		self.label2.setText(texto)
 		self.plot_NRZ()
 
 		#gerando imagem
 		self.recuperaIMG()
 
 	def recuperaIMG(self):	
-		print len(self.vetorINT)
-		print self.vetorINT[0],self.vetorINT[1]
+		#print len(self.vetorINT)
+		#print self.vetorINT[0],self.vetorINT[1]
 		self.vetorIMG = np.zeros((self.vetorINT[0],self.vetorINT[1]))
 		incremento = 0
+		lista_teste = []
 		for i in range(0,self.vetorINT[1]):
 			for j in range(0,self.vetorINT[0]):
-				self.vetorIMG[j][i] = self.vetorINT[j+incremento+2]				
+				self.vetorIMG[j][i] = self.vetorINT[j+incremento+2]
+				lista_teste.append(self.vetorIMG[j][i])				
 			incremento += self.vetorINT[0]
 		image = QImage()
 		arr2im = Image.fromarray(self.vetorIMG) #convertendo matriz para imagem		#
 		arr2im.save("recebido.gif")
+		#print lista_teste
+		#print len(lista_teste)
 
 		self.labelIMAGE.setPixmap(QPixmap('recebido.gif'))		
 		self.scaleFactor = 1.0
