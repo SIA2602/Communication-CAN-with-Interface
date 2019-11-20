@@ -1279,7 +1279,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		texto = self._hex_to_binary([hex(x)[2:] for x in list_aux])
 		self.binario = []	
 		self.binario = self.return_bin(texto) #pegando valores binario e jogando em uma lista
-		#print self.binario					
+		#print self.binario
+		self.label2.setStyleSheet('color: black')						
 		self.label2.setText(texto)
 		self.plot_NRZ()
 
